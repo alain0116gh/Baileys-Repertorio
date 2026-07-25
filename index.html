@@ -1,335 +1,2448 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repertorio Baileys</title>
+  <style>
+    /* Página general */
+    body {
+      background: #0f1115;
+      color: #eeeeee;
+      font-family: "Segoe UI", Arial, sans-serif;
+      padding: 24px;
+    }
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    h1 {
+      color: #e8b34a;
+      font-size: 22px;
+    }
 
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    p {
+      color: #999999;
+      font-size: 13px;
+    }
 
-    <link rel="stylesheet" href="phoenix-pro.css">
+    /* Buscador */
+    input {
+      background: #171a21;
+      color: #eeeeee;
+      border: 1px solid #2a2e38;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    /* Tabla */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #171a21;
+      border-radius: 8px;
+    }
+
+    th {
+      background: #1f232c;
+      color: #e8b34a;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 10px 12px;
+      font-size: 13px;
+      border-bottom: 1px solid #2a2e38;
+    }
+
+    tr:hover {
+      background: #1d212a;
+    }
+
+    /* Botones */
+    button {
+      background: #e8b34a;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      margin-right: 6px;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    /* Selectores */
+    select {
+      background: #171a21;
+      color: #eeeeee;
+      border: 1px solid #2a2e38;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 10px;
+      margin-right: 6px;
+    }
+
+    /* Botón editar en la tabla */
+    .btn-editar {
+      background: #2a2e38;
+      color: #e8b34a;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-editar:hover {
+      background: #e8b34a;
+      color: #1a1a1a;
+    }
+
+    /* Modal */
+    #modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);   /* corregido: rga → rgba */
+      display: flex;                      /* corregido: felx → flex */
+      align-items: center;
+      justify-content: center;
+    }
+
+    #modalContenido {
+      background: #1f232c;
+      border: 1px solid #2a2e38;
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #modalContenido h2 {
+      color: #e8b34a;
+      font-size: 16px;
+      margin: 0 0 16px;
+    }
+
+    #modalContenido input {
+      margin-bottom: 10px;
+    }
+
+    #btnEliminar {
+      background: #e05555;
+      color: #ffffff;
+    }
+
+    #btnCerrarModal {
+      background: #2a2e38;
+      color: #eeeeee;
+    }
+  </style>
 </head>
 <body>
-    <!-- Progress Indicator -->
-    <div class="progress-container phcode-no-lp-edit ">
-        <div class="progress-indicator">
-            <div class="progress-dot" data-section="2">
-                <span class="dot-number">1</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-dot" data-section="3">
-                <span class="dot-number">2</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-dot" data-section="4">
-                <span class="dot-number">3</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-dot" data-section="5">
-                <span class="dot-number">4</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-dot" data-section="6">
-                <span class="dot-number">5</span>
-            </div>
-        </div>
+
+  <h1>Repertorio Baileys</h1>
+  <p>Canciones en el repertorio: <span id="totalCanciones">0</span></p>
+
+  <input type="search" id="buscador" placeholder="Buscar en todos los campos...">
+
+  <select id="filtroRitmo">
+    <option value="">Ritmo (todos)</option>
+  </select>
+
+  <select id="filtroInterprete">
+    <option value="">Intérprete (todos)</option>
+  </select>
+
+  <br>
+
+  <button id="btnAgregar">+ Agregar canción</button>
+  <button id="btnExportar">↓ Exportar JSON</button>
+  <button id="btnImportar">↑ Importar JSON</button>
+  <button id="btnDescargarHTML">↓ Descargar lista actualizada</button>
+  <input type="file" id="inputImportar" accept=".json" style="display: none;">
+
+  <div id="formulario" style="display: none;">
+    <input type="text" id="nuevaCancion"    placeholder="Canción">
+    <input type="text" id="nuevoArtista"    placeholder="Artista">
+    <input type="text" id="nuevoRitmo"      placeholder="Ritmo">
+    <input type="text" id="nuevoInterprete" placeholder="Intérprete">
+    <button id="btnGuardar">Guardar</button>
+    <button id="btnCancelar">Cancelar</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Canción</th>
+        <th>Artista</th>
+        <th>Ritmo</th>
+        <th>Intérprete</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="cuerpo"></tbody>
+  </table>
+
+  <div id="modal" style="display: none;">
+    <div id="modalContenido">
+      <h2>Editar canción</h2>
+      <input type="text" id="editCancion"    placeholder="Canción">
+      <input type="text" id="editArtista"    placeholder="Artista">
+      <input type="text" id="editRitmo"      placeholder="Ritmo">
+      <input type="text" id="editInterprete" placeholder="Intérprete">
+      <button id="btnGuardarEdicion">Guardar cambios</button>
+      <button id="btnEliminar">Eliminar</button>
+      <button id="btnCerrarModal">Cancelar</button>
     </div>
+  </div>
 
-    <!-- Main Container -->
-    <main class="game-container phcode-no-lp-edit-this">
-        <!-- Section 1: What is Live Preview Editing -->
-        <div class="paper-card section active phcode-no-lp-edit" id="section-1" data-section="1" style="display: none;">
-            <div class="section-header ">
-                <h2 class="section-title">Editar en Vista Previa en Vivo</h2>
-                <p class="section-subtitle">Edita tu página visualmente -&nbsp; <b>Tu HTML se actualiza al instante</b></p>
-            </div>
+  <script>
+const canciones = [
+  { cancion: "(Everything I Do) I do it for You", artista: "Bryan Adams", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "(Just Like) Starting Over", artista: "John Lennon", ritmo: null, interprete: "Hombre" },
+  { cancion: "(They Long to Be) Close to You", artista: "The Carpenters", ritmo: null, interprete: null },
+  { cancion: "10,000 Hours", artista: "Dan and Shay ft. Justin Bieber", ritmo: null, interprete: null },
+  { cancion: "17 Años", artista: "Los Ángeles Azules", ritmo: null, interprete: null },
+  { cancion: "24K Magic", artista: "Bruno Mars", ritmo: "FunkPop", interprete: "Hombre" },
+  { cancion: "A Dios le Pido", artista: "Juanes", ritmo: null, interprete: null },
+  { cancion: "A Donde va el Amor", artista: "Yuridia", ritmo: "16BeatBallad", interprete: "Mujer" },
+  { cancion: "A Fuego Lento", artista: "Rosana", ritmo: "Samba", interprete: "Mujer" },
+  { cancion: "A la Antigüita", artista: "La Necesidad Norteña", ritmo: "Zapateado", interprete: "Hombre" },
+  { cancion: "A Labio Dulce", artista: "Iskander", ritmo: "JazzFusion", interprete: "Hombre" },
+  { cancion: "A Puro Dolor", artista: "Son By Four", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  {
+    cancion: "A Que no me Dejas",
+    artista: "Alejandro Sanz ft. Alejandro Fernández",
+    ritmo: "90s8BeatBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "A Quien le Importa", artista: "Thalia", ritmo: "ClubDance2", interprete: "Mujer" },
+  { cancion: "A Quien Tú Decidiste Amar", artista: "Sandoval", ritmo: "AcousticRock", interprete: "Dueto" },
+  { cancion: "A Thousand Miles", artista: "Vanessa Carlton", ritmo: null, interprete: null },
+  { cancion: "A Thousand Years", artista: "Christina Perri", ritmo: "12-8PopBallad", interprete: "Mujer" },
+  {
+    cancion: "A Time For Us (Romeo y Julieta)",
+    artista: "Nino Rota",
+    ritmo: "Balada Acústica",
+    interprete: "Instrumental"
+  },
+  { cancion: "A Whiter Shade of Pale", artista: "Procol Harum", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "A Whole New World (Aladdin)", artista: "Disney", ritmo: "AnimationBallad", interprete: "Dueto" },
+  { cancion: "ABC", artista: "Sin Bandera", ritmo: "LoveSong", interprete: "Dueto" },
+  { cancion: "Abrázame", artista: "Camila", ritmo: "CountryPopDuo", interprete: "Hombre" },
+  { cancion: "Abrázame muy Fuerte", artista: "Juan Gabriel ", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "Absurda Cenicienta", artista: "Chenoa", ritmo: "GrungeRock", interprete: "Mujer" },
+  { cancion: "Acá Entre Nos", artista: "Vicente Fernandez", ritmo: "Mariachi 2-4", interprete: "Hombre" },
+  {
+    cancion: "Acaríñame",
+    artista: "Los Ángeles Azules ft. Julieta Venegas, Juan Ingaramo, Jay de la Cueva",
+    ritmo: "PopCumbia",
+    interprete: "Dueto"
+  },
+  { cancion: "Acelerar", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Acércate Más", artista: "Osvaldo Farrés", ritmo: "BoleroLento", interprete: "Instrumental" },
+  { cancion: "Acompáñame", artista: "Enrique Guzman", ritmo: "ClassicBigBand", interprete: "Hombre" },
+  { cancion: "Adios", artista: "Selena Gomez", ritmo: "Reggaeton2", interprete: "Mujer" },
+  { cancion: "Adios Amor", artista: "Chicos de Barrio", ritmo: "CumbiaSonideraA", interprete: "Dueto" },
+  { cancion: "Adios Amor", artista: "Christian Nodal", ritmo: "BoleroRancheroExp", interprete: "Hombre" },
+  { cancion: "Adios Muchachos", artista: "Instrumental", ritmo: "Tango", interprete: "Hombre" },
+  { cancion: "Adore You", artista: "Harry Styles", ritmo: null, interprete: null },
+  { cancion: "Adoro", artista: "Armando Manzanero", ritmo: "Orchestral6-8", interprete: "Hombre" },
+  { cancion: "Adventure of a Lifetime", artista: "Coldplay", ritmo: "KissDancePop", interprete: "Hombre" },
+  { cancion: "Afortunadamente no Eres Tú", artista: "Paty Cantu", ritmo: "Swedish8BeatPop", interprete: "Mujer" },
+  { cancion: "Afuera del Planeta ", artista: "Manuel Medrano", ritmo: "90sAussiePop", interprete: "Hombre" },
+  { cancion: "Agua", artista: "Jarabe de Palo", ritmo: "LoungeBossa", interprete: "Hombre" },
+  { cancion: "Ahora", artista: "Yuri", ritmo: "90sPopBallad", interprete: "Mujer" },
+  { cancion: "Ahora Entendí", artista: "Yuridia", ritmo: "SoulfulBallad", interprete: "Mujer" },
+  { cancion: "Ahora te Puedes Marchar", artista: "Luis Miguel", ritmo: null, interprete: "Hombre" },
+  { cancion: "Ahora Tú", artista: "Malú", ritmo: "6-8BalladRock", interprete: "Mujer" },
+  {
+    cancion: "Ai Se Eu Te Pego/Balada Boa",
+    artista: "Michel Telo/Gustavo Lima",
+    ritmo: "ClubReggaeton",
+    interprete: "Hombre"
+  },
+  { cancion: "Al Frio", artista: "Leonel García ft. Natalia Lafourcade", ritmo: "LoungeBossa", interprete: "Dueto" },
+  { cancion: "Alejandra (Vals)", artista: "Vicente Fernandez", ritmo: "MariachiWaltz", interprete: "Instrumental" },
+  { cancion: "Alejate de Mí", artista: "Camila", ritmo: "OrchRockBallad2", interprete: "Hombre" },
+  { cancion: "Algo Contigo", artista: "Rosario", ritmo: "SlowBossa", interprete: "Mujer" },
+  { cancion: "Algo Mas", artista: "La Quinta Estacion", ritmo: "OrchRockBallad2", interprete: "Mujer" },
+  { cancion: "Alguna Vez", artista: "Matisse", ritmo: "Balada Acústica", interprete: "Dueto" },
+  { cancion: "All About That Bass", artista: "Meghan Trainor", ritmo: "RetroSoul", interprete: "Mujer" },
+  { cancion: "All by Miself (Solo Otra Vez)", artista: "Il Divo", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "All I Ask", artista: "Adele", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "All I Want", artista: "Kodaline", ritmo: "6-8GuitarBallad", interprete: "Hombre" },
+  { cancion: "All I Want for Christmas is You", artista: "Mariah Carey", ritmo: "50sRock&Roll", interprete: "Mujer" },
+  { cancion: "All of Me", artista: "Frank Sinatra", ritmo: "BigBandSwing", interprete: "Instrumental (Jazz)" },
+  { cancion: "All of Me", artista: "John Legend", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "All the Good Girls go to Hell", artista: "Billie Eilish", ritmo: "UKSoul", interprete: "Mujer" },
+  {
+    cancion: "All the Things You Are",
+    artista: "Ella Fitzgerald",
+    ritmo: "ClassicBigBand",
+    interprete: "Instrumental (Jazz)"
+  },
+  { cancion: "Almohada", artista: "Jose Jose", ritmo: "PopLatinBallad", interprete: "Hombre" },
+  { cancion: "Always", artista: "Bon Jovi", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Always Remember Us This Way", artista: "Lady Gaga", ritmo: "OrchRockBallad1", interprete: "Mujer" },
+  { cancion: "Ámame Hasta con los Dientes", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Amanecí en tus Brazos", artista: "José Alfredo Jimenez", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "Amante a la Antigua", artista: "Roberto Carlos", ritmo: "EasySwing", interprete: "Hombre" },
+  { cancion: "Amapola", artista: "Andrea Bocelli", ritmo: "Rumba", interprete: "Instrumental (Jazz)" },
+  { cancion: "Amar y Querer", artista: "Kalimba", ritmo: "EpicBallad", interprete: "Hombre" },
+  { cancion: "Amargo Adios", artista: "Inspector", ritmo: "Ska", interprete: "Hombre" },
+  { cancion: "Amárrame", artista: "Mon Laferte ft. Juanes", ritmo: "PopCumbia", interprete: "Dueto" },
+  { cancion: "Amarte a la Antigua", artista: "Pedro Fernandez", ritmo: "BaladaRomantica", interprete: "Hombre" },
+  { cancion: "Amarte Así", artista: "Carlos Macías", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Amiga", artista: "Miguel Bose", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Amiga Mía", artista: "Alejandro Sanz", ritmo: "ContempGuitarPop", interprete: "Hombre" },
+  { cancion: "Amigos no Por Favor", artista: "Yuridia", ritmo: "16BtBallad", interprete: "Mujer" },
+  { cancion: "Amor (Amor, Amor, Amor)", artista: "Luis Miguel", ritmo: "Organ Cha-cha", interprete: "Instrumental" },
+  { cancion: "Amor a la Mexicana", artista: "Thalia", ritmo: "PopLatin", interprete: "Mujer" },
+  { cancion: "Amor a Medias", artista: "Ha-Ash", ritmo: "CanadianRock", interprete: "Mujer" },
+  {
+    cancion: "Amor a Primera Vista",
+    artista: "Los Angeles Azules ft. Belinda, Lalo Ebratt, Horacio Palencia",
+    ritmo: "PopCumbia",
+    interprete: "Dueto"
+  },
+  { cancion: "Amor Completo", artista: "Mon Laferte", ritmo: "6-8BalladRock", interprete: "Mujer" },
+  { cancion: "Amor de Estudiante", artista: "Roberto Jordan", ritmo: "6-8SlowRock", interprete: "Hombre" },
+  { cancion: "Amor Eterno", artista: "Camila", ritmo: "6-8BalladRock", interprete: "Hombre" },
+  { cancion: "Amor Eterno", artista: "Rocío Dúrcal", ritmo: "BoleroMariachi", interprete: "Mujer" },
+  { cancion: "Amor Prohibido", artista: "Selena", ritmo: null, interprete: "Mujer" },
+  { cancion: "Amor Real", artista: "Sin Bandera", ritmo: "90s8BeatBallad", interprete: "Hombre" },
+  { cancion: "Amorcito Corazón", artista: "Pedro Infante", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Amores Lejanos", artista: "Los Enanitos Verdes", ritmo: "Country8Beat3", interprete: "Hombre" },
+  { cancion: "And I Love Her", artista: "The Beatles", ritmo: "Rumba", interprete: "Hombre" },
+  { cancion: "Andante, Andante", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Andar Conmigo", artista: "Julieta Venegas", ritmo: "AlpenSchlager", interprete: "Mujer" },
+  { cancion: "Angel", artista: "Jon Secada", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "Angel", artista: "Sarah Mclachlan", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Angel", artista: "Yuridia", ritmo: "VocalPopBallad", interprete: "Mujer" },
+  { cancion: "Angeleyes", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Ansiedad", artista: "Guadalupe Pineda", ritmo: "PopWaltz", interprete: "Mujer" },
+  { cancion: "Antes", artista: "Obie Bermudez", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Antes de Que te Vayas", artista: "Marco Antonio Solis", ritmo: "Cool8Beat", interprete: "Hombre" },
+  { cancion: "Antes de Ti", artista: "Mon Laferte", ritmo: "EasyBallad", interprete: "Mujer" },
+  { cancion: "Antes que al Mio", artista: "Los Claxons", ritmo: "LoveSong", interprete: "Hombre" },
+  {
+    cancion: "Antologia/Luz de Día",
+    artista: "Shakira/Los Enanitos Verdes",
+    ritmo: "PopLatinBallad",
+    interprete: "Mujer/Hombre"
+  },
+  { cancion: "Anywhere", artista: "Rita Ora", ritmo: "ClubBeat", interprete: "Mujer" },
+  { cancion: "Aquí Abajo", artista: "Christian Nodal", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  {
+    cancion: "Aquí Estoy Yo",
+    artista: "Luis Fonsi ft. David Bisbal, Aleks Syntek, Noel Schajris",
+    ritmo: "6-8BalladRock",
+    interprete: "Hombre"
+  },
+  { cancion: "Arriba y Abajo", artista: "Caballo Dorado", ritmo: null, interprete: "Hombre" },
+  { cancion: "As it Was", artista: "Harry Styles", ritmo: null, interprete: null },
+  { cancion: "As Long as you Love Me", artista: "Backstreet Boys", ritmo: null, interprete: null },
+  { cancion: "As Time Goes By", artista: "Frank Sinatra", ritmo: "DreamyBallad", interprete: "Instrumental (Jazz)" },
+  { cancion: "Así como si Nada", artista: "Samo", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "Así Era Ella", artista: "Cristian Castro", ritmo: "Acoustic8BtBallad", interprete: "Hombre" },
+  { cancion: "Así es la Vida", artista: "Elefante", ritmo: "PopCumbia", interprete: "Hombre" },
+  { cancion: "Así Fue", artista: "Playa Limbo", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  { cancion: "At Last", artista: "Beyonce", ritmo: "Orchestral6-8", interprete: "Mujer" },
+  { cancion: "Atrevete a Mirarme de Frente", artista: "Mariana Seoane", ritmo: "CumbiaFuego", interprete: "Mujer" },
+  { cancion: "August", artista: "Taylor Swift", ritmo: "Chillout2", interprete: "Mujer" },
+  { cancion: "Aún", artista: "Coda", ritmo: "90sRockBallad", interprete: "Hombre" },
+  {
+    cancion: "Aunque no sea Conmigo",
+    artista: "Celso Piña ft. Café Tacuba",
+    ritmo: "PopLatinBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "Autumn Leaves", artista: "Standard", ritmo: null, interprete: "Instrumental (Jazz)" },
+  { cancion: "Azucar", artista: "Kumbia Kings", ritmo: "KumbiaKings", interprete: "Hombre" },
+  { cancion: "Azucar, Shhh, No Tengo Dinero", artista: "Kumbia Kings", ritmo: "KumbiaKings", interprete: "Hombre" },
+  { cancion: "Bachata Rosa, Burbujas de Amor", artista: "Juan Luis Guerra", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Back to Black", artista: "Amy Winehouse", ritmo: "SoulSupreme", interprete: "Mujer" },
+  { cancion: "Bad Guy", artista: "Billie Eilish", ritmo: "EDM Anthem", interprete: "Mujer" },
+  {
+    cancion: "Baila Conmigo",
+    artista: "Selena Gomez ft. Rauw Alejandro",
+    ritmo: "ReggaetonSlowJam",
+    interprete: "Dueto"
+  },
+  { cancion: "Baila Esta Cumbia", artista: "Selena ft. Kumbia Kings", ritmo: "KumbiaKings", interprete: "Dueto" },
+  { cancion: "Baila mi Corazón", artista: "Belanova", ritmo: "90sDisco", interprete: "Mujer" },
+  { cancion: "Bailan Rochas y Chetas", artista: "Nene Malo", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  {
+    cancion: "Bailando en la Sierra",
+    artista: "Montez de Durango",
+    ritmo: "BandaDuranguense",
+    interprete: "Instrumental"
+  },
+  {
+    cancion: "Bailando/Noche y de Día/Duele el Corazón",
+    artista: "Enrique Iglesias ft. Gente de Zona",
+    ritmo: "ClubReggaeton",
+    interprete: "Hombre"
+  },
+  { cancion: "Bailar", artista: "Leonel García", ritmo: "6-8BalladRock", interprete: "Hombre" },
+  { cancion: "Bailar Contigo", artista: "Monsieur Periné", ritmo: "RumbaFlamenco", interprete: "Mujer" },
+  { cancion: "Bajo el Agua", artista: "Manuel Medrano", ritmo: "16BeatRock", interprete: "Hombre" },
+  { cancion: "Bandido", artista: "Ana Barbara", ritmo: "CumbiaPeru", interprete: "Mujer" },
+  { cancion: "Bará Bará, Beré, Beré", artista: "Michel Teló", ritmo: "ReggaetonDJ", interprete: "Hombre" },
+  { cancion: "Barbie Girl", artista: "Aqua", ritmo: "ClubDance2", interprete: "Dueto" },
+  { cancion: "Basket Case", artista: "Green Day", ritmo: null, interprete: null },
+  { cancion: "Basta Ya", artista: "Olga Tañón", ritmo: "CountryBallad", interprete: "Mujer" },
+  { cancion: "Be the One", artista: "Dua Lipa", ritmo: "CountryPop", interprete: "Mujer" },
+  { cancion: "Beauty and the Beast", artista: "Disney", ritmo: "AnimationBallad", interprete: "Instrumental" },
+  { cancion: "Bed of Roses", artista: "Bon Jovi", ritmo: "6-8BalladRock", interprete: "Hombre" },
+  { cancion: "Before You Go", artista: "Lewis Capaldi", ritmo: "Worship6-8", interprete: "Hombre" },
+  { cancion: "Bendita tu Luz", artista: "Maná ft. Juan Luis Guerra", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Bésame", artista: "Ricardo Montaner", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Bésame ", artista: "Camila", ritmo: "6-8SoulBallad", interprete: "Hombre" },
+  { cancion: "Besame Mucho", artista: "Standar", ritmo: "BossaNova", interprete: "Instrumental (Jazz)" },
+  { cancion: "Besos de Ceniza", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Better Man", artista: "Robbie Williams", ritmo: "SongwriterBallad", interprete: "Hombre" },
+  { cancion: "Bidi Bidi bom bom", artista: "Selena", ritmo: null, interprete: "Mujer" },
+  { cancion: "Bien o Mal", artista: "Julieta Venegas", ritmo: "CountryFolkUpbeat", interprete: "Mujer" },
+  {
+    cancion: "Black Orpheus (A Day in the Life)",
+    artista: "Standard",
+    ritmo: "BossaBrazil",
+    interprete: "Instrumental (Jazz)"
+  },
+  { cancion: "Blank Space", artista: "Taylor Swift", ritmo: "NatureHipHop", interprete: "Mujer" },
+  { cancion: "Blow Your Mind", artista: "Dua Lipa", ritmo: null, interprete: null },
+  { cancion: "Blue Bossa", artista: "Standard", ritmo: "CoolBossa", interprete: "Instrumental (Jazz)" },
+  {
+    cancion: "Bomboro Quiñá Quiñá",
+    artista: "La Sonora Santanera ft. Ruben Albarran",
+    ritmo: "Guajira",
+    interprete: "Hombre"
+  },
+  { cancion: "Bonita Finca de Adobe", artista: "Ramón Ayala", ritmo: "Norteña2-4", interprete: "Hombre" },
+  { cancion: "Borro Casette", artista: "Maluma", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  {
+    cancion: "Botella Tras Botella",
+    artista: "Gera MX ft. Christian Nodal",
+    ritmo: "BritPopSwing",
+    interprete: "Hombre"
+  },
+  { cancion: "Boulevard", artista: "Jenny and the Mexicats", ritmo: null, interprete: "Dueto" },
+  { cancion: "Brasil", artista: "Ray Conniff", ritmo: "SambaRio", interprete: "Instrumental (Jazz)" },
+  { cancion: "Break Free", artista: "Ariana Grande ft. Zedd", ritmo: "ClubMixDJ", interprete: "Mujer" },
+  { cancion: "Break my Heart", artista: "Dua Lipa", ritmo: "70sDiscoFunk", interprete: "Mujer" },
+  { cancion: "Brillas ", artista: "Leon Larregui", ritmo: "ModernPickin'", interprete: "Hombre" },
+  { cancion: "Brindo Por tu Cumpleaños", artista: "Los Caminantes", ritmo: "EasyBallad", interprete: "Hombre" },
+  { cancion: "Buenos Dias Amor", artista: "Cristian Castro", ritmo: "CountryPop", interprete: "Hombre" },
+  { cancion: "Bumblebee", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Burn", artista: "Ellie Goulding", ritmo: "AngelSun", interprete: "Mujer" },
+  { cancion: "Burning", artista: "Sam Smith", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Butter", artista: "BTS", ritmo: null, interprete: null },
+  { cancion: "Cada Beso", artista: "Benny, Sasha y Erick", ritmo: "StandardRock", interprete: "Dueto" },
+  { cancion: "Cada Que", artista: "Belanova", ritmo: "EDM Anthem", interprete: "Mujer" },
+  { cancion: "Cake by the Ocean", artista: "DNCE", ritmo: "JazzFusion", interprete: "Hombre" },
+  { cancion: "California Gurls", artista: "Katy Perry ft. Snoop Dogg", ritmo: null, interprete: null },
+  { cancion: "Call Me", artista: "In This Moment", ritmo: "70sStraightRock", interprete: "Mujer" },
+  { cancion: "Calma", artista: "Pedro Capó", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  { cancion: "Cama y Mesa", artista: "Roberto Carlos", ritmo: "8BeatAdria", interprete: "Hombre" },
+  {
+    cancion: "Camarón Pelao, Tamarindo",
+    artista: "Banda el Recodo/Banda Jerez",
+    ritmo: "Quebradita Acst",
+    interprete: "Hombre"
+  },
+  { cancion: "Cambio de Piel", artista: "Marc Anthony", ritmo: "SalsaRomantica", interprete: "Hombre" },
+  { cancion: "Camilo Sesto Medley", artista: "Yahir", ritmo: null, interprete: "Hombre" },
+  {
+    cancion: "Caminos de Michoacan/Santiago Papasquiaro",
+    artista: "Mariachi los Caporales/Paraiso Tropical",
+    ritmo: "Banda 2-4",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Can You Feel the Love Tonight (El Rey León)",
+    artista: "Disney",
+    ritmo: "BroadwayBallad",
+    interprete: "Instrumental"
+  },
+  { cancion: "Canalla", artista: "Sonora de Margarita", ritmo: "CumbiaEcuador", interprete: "Mujer" },
+  { cancion: "Cancioncitas de Amor", artista: "Romeo Santos", ritmo: "PopBachata", interprete: "Hombre" },
+  { cancion: "Candilejas", artista: "Charles Chaplin", ritmo: "VocalWaltz", interprete: "Instrumental" },
+  { cancion: "Can't Feel my Face", artista: "The Weeknd", ritmo: "JazzFusion", interprete: "Hombre" },
+  { cancion: "Can't Help Falling in Love", artista: "Elvis Presley", ritmo: "6-8SlowRock", interprete: "Hombre" },
+  { cancion: "Can't Take my Eyes off You", artista: "Andy Williams", ritmo: "60sBlueEyes", interprete: "Hombre" },
+  { cancion: "Canta Corazon", artista: "Alejandro Fernández", ritmo: "SalsaGranCiclon", interprete: "Hombre" },
+  { cancion: "Capullo y Sorullo", artista: "La Sonora Dinamita", ritmo: "CumbiaSureste", interprete: "Dueto" },
+  { cancion: "Caraluna", artista: "Bacilos", ritmo: "Reggaeton2", interprete: "Hombre" },
+  { cancion: "Caray", artista: "Juan Gabriel", ritmo: "MariachiPolca", interprete: "Hombre" },
+  { cancion: "Careless Whisper", artista: "George Michael", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Carrie", artista: "Europe", ritmo: null, interprete: null },
+  { cancion: "Cásate Conmigo", artista: "Belanova", ritmo: "80sBritishPop", interprete: "Mujer" },
+  { cancion: "Cásate Conmigo", artista: "Reyli", ritmo: "LoveSong", interprete: "Hombre" },
+  { cancion: "Causa y Efecto", artista: "Paulina Rubio", ritmo: "CaliforniaCountry", interprete: "Mujer" },
+  { cancion: "Celos", artista: "Fanny Lu", ritmo: "SchlagerBeat", interprete: "Mujer" },
+  { cancion: "Chachachá", artista: "Jósean Log", ritmo: "ChaChaPop", interprete: "Hombre" },
+  { cancion: "Chandelier", artista: "Sia", ritmo: "NatureHipHop", interprete: "Mujer" },
+  { cancion: "Chantaje", artista: "Shakira ft. Maluma", ritmo: null, interprete: "Dueto" },
+  { cancion: "Cheap Thrills", artista: "Sia", ritmo: "Chillout2", interprete: "Mujer" },
+  { cancion: "Chetos y Cumbieros", artista: "Nene Malo", ritmo: "ReggaetonDJ", interprete: "Hombre" },
+  { cancion: "Chiquilla", artista: "Kumbia All Starz", ritmo: "CumbiaReggae", interprete: "Hombre" },
+  { cancion: "Chiquilla Cariñosa", artista: "Pesado", ritmo: "CumbiaNrteLent", interprete: "Hombre" },
+  { cancion: "Chiquitita", artista: "Abba", ritmo: "ModernPickin'", interprete: "Mujer" },
+  { cancion: "Chocolate", artista: "Jesse & Joy", ritmo: "US SingerPop", interprete: "Mujer" },
+  {
+    cancion: "Cicatrices (cover de Regulo Caro)",
+    artista: "Carolina Ross",
+    ritmo: "Balada Acústica",
+    interprete: "Mujer"
+  },
+  { cancion: "Cielo 2002", artista: "Benny Ibarra", ritmo: "StandardRock", interprete: "Hombre" },
+  { cancion: "Cielo Azul Cielo Nublado/Quiero que Sepas", artista: "Pesado", ritmo: null, interprete: "Hombre" },
+  { cancion: "Cielo Rojo", artista: "Mariachi Vargas", ritmo: "MariHuapango", interprete: "Hombre" },
+  { cancion: "Cien Años", artista: "Pedro Infante", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Clavado en un Bar", artista: "Maná", ritmo: "70sStraightRock", interprete: "Hombre" },
+  { cancion: "Cloks", artista: "Coldplay", ritmo: "BritRockPop", interprete: "Hombre" },
+  { cancion: "Cobarde ", artista: "Yuridia", ritmo: "Worship6-8", interprete: "Mujer" },
+  { cancion: "Coincidir", artista: "Alberto Escobar", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Cold Water", artista: "Major Lazer ft. Justin Bieber and MO", ritmo: "PopR&B", interprete: "Dueto" },
+  { cancion: "Coleccionista de Canciones", artista: "Camila", ritmo: "PowerBallad", interprete: "Hombre" },
+  {
+    cancion: "Colgando en tus Manos",
+    artista: "Carlos Baute ft Marta Sanchez",
+    ritmo: "RockCha-Cha",
+    interprete: "Dueto"
+  },
+  { cancion: "Come Away With Me", artista: "Norah Jones", ritmo: "SlowJazzWaltz", interprete: "Mujer" },
+  { cancion: "Come Together", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "Como Fue", artista: "José José", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Como han Pasado los Años", artista: "Rocío Dúrcal", ritmo: "BoleroLento", interprete: "Mujer" },
+  { cancion: "Como la Flor", artista: "Selena", ritmo: "CumbiaNova", interprete: "Mujer" },
+  { cancion: "Como le Hacemos", artista: "Yuri ft. Matisse", ritmo: "Reggaeton2", interprete: "Dueto" },
+  { cancion: "Como Pagarte", artista: "Carlos Rivera", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Como Sería", artista: "Soraya", ritmo: "ContempGrtPop", interprete: "Mujer" },
+  { cancion: "Como Sufro", artista: "Los Babys ft. Gloria Trevi", ritmo: "8BeatAdria", interprete: "Dueto" },
+  { cancion: "Como te Va mi Amor", artista: "Pandora", ritmo: "Acoustic8BtBallad", interprete: "Mujer" },
+  { cancion: "Como te Voy a Olvidar", artista: "Los Angeles Azules", ritmo: "Grupera", interprete: "Hombre" },
+  { cancion: "Como tu Mujer", artista: "Rocío Dúrcal", ritmo: "Cool8Beat", interprete: "Mujer" },
+  { cancion: "Como yo Nadie te ha Amado", artista: "Yuridia", ritmo: "6-8GuitarBallad", interprete: "Mujer" },
+  { cancion: "Compartir", artista: "Carla Morrison", ritmo: "6-8SlowRock", interprete: "Mujer" },
+  { cancion: "Complicated", artista: "Avril Lavigne", ritmo: "UK FolkPop", interprete: "Mujer" },
+  { cancion: "Complicidad", artista: "Vanesa Martin ft. Manuel Medrano", ritmo: "BoyBandBallad", interprete: "Dueto" },
+  { cancion: "Con los Años que me Quedan", artista: "Gloria Estefan", ritmo: "BoleroLento", interprete: "Mujer" },
+  { cancion: "Con Quien se Queda el Perro", artista: "Jesse & Joy", ritmo: "SoulfulBallad", interprete: "Mujer" },
+  { cancion: "Con Todos Menos Conmigo", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Confieso", artista: "Leonel García ft. Natalia Lafourcade", ritmo: "CountryPop", interprete: "Dueto" },
+  { cancion: "Consequences", artista: "Camila Cabello", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Contigo", artista: "Canto del Loco ft. Natalia Lafourcade", ritmo: "80sGuitarPop", interprete: "Dueto" },
+  { cancion: "Contigo", artista: "Río Roma", ritmo: "LoveSong", interprete: "Hombre" },
+  { cancion: "Contigo", artista: "Yuridia", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  { cancion: "Contigo Aprendí", artista: "Armando Manzanero", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Contigo en la Distancia", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Convenceme", artista: "Shaila Durcal", ritmo: "Mariachi2-4Lento", interprete: "Mujer" },
+  { cancion: "Cool", artista: "Gwen Stefani", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  { cancion: "Cool Kids", artista: "Echosmith", ritmo: "Up-tempo8Beat", interprete: "Mujer" },
+  { cancion: "Corazón", artista: "Maluma ft. Nego do Borel", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  { cancion: "Corazón de Roca", artista: "Los Fresno", ritmo: "8BeatAdria", interprete: "Hombre" },
+  { cancion: "Corazón en la Maleta", artista: "Luis Fonsi", ritmo: "CountryFolkUpbeat", interprete: "Hombre" },
+  { cancion: "Corazón Maldito", artista: "Marco Antonio Muñiz", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Corazón Partío", artista: "Alejandro Sanz", ritmo: "90sGuitarPop", interprete: "Hombre" },
+  { cancion: "Corre", artista: "Jesse & Joy", ritmo: "LoveSong", interprete: "Mujer" },
+  { cancion: "Corro, Vuelo, me Acelero", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Costumbres ", artista: "Rocío Dúrcal", ritmo: "BoleroRancheroExp", interprete: "Mujer" },
+  { cancion: "Creep", artista: "Radiohead", ritmo: "GrungeRock", interprete: "Hombre" },
+  { cancion: "Creo en Ti", artista: "Reik", ritmo: "UnpluggedPop", interprete: "Hombre" },
+  { cancion: "Cruz de Navajas", artista: "Mecano", ritmo: "70sBeatBallad", interprete: "Mujer" },
+  { cancion: "Cuando Calienta el Sol", artista: "Luis Miguel", ritmo: null, interprete: "Hombre" },
+  { cancion: "Cuando Digo tu Nombre", artista: "Leonel Garcia ft. Malú", ritmo: "PopEvergreen", interprete: "Dueto" },
+  { cancion: "Cuando Estas Conmigo", artista: "Reik", ritmo: "US SingerPop", interprete: "Hombre" },
+  { cancion: "Cuando la Noche Llega", artista: "Vazquez Sound", ritmo: "US CountryPop", interprete: "Mujer" },
+  {
+    cancion: "Cuando me Enamoro",
+    artista: "Enrique Iglesias ft. Juan Luis Guerra",
+    ritmo: "PopBossa",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Cuando nos Volvamos a Encontrar",
+    artista: "Carlos Vives ft. Marc Anthony",
+    ritmo: "SalsaNYC",
+    interprete: "Hombre"
+  },
+  { cancion: "Cuando Seas Grande", artista: "Miguel Mateos", ritmo: "PowerRock", interprete: "Hombre" },
+  { cancion: "Cuando Tú no Estás", artista: "Raphael", ritmo: "Balada Acústica", interprete: "Instrumental" },
+  { cancion: "Cuando Vuelva a tu Lado", artista: "Maria Greever", ritmo: "BoleroLento", interprete: "Mujer" },
+  { cancion: "Cuidado con el Corazón", artista: "Alejandra Guzmán", ritmo: "OrchRockBallad2", interprete: "Mujer" },
+  { cancion: "Cuidate", artista: "La Oreja de Van Gogh", ritmo: "CountryRock", interprete: "Mujer" },
+  {
+    cancion: "Culpable o No (Mienteme como Siempre)",
+    artista: "Luis Miguel",
+    ritmo: "70sPopDuo2",
+    interprete: "Hombre"
+  },
+  { cancion: "Cumbia del Sol", artista: "Control", ritmo: "Cumbia Texana", interprete: "Hombre" },
+  { cancion: "Dance Monkey", artista: "Tones and I", ritmo: "FunkPopRock", interprete: "Mujer" },
+  { cancion: "Dancing Queen", artista: "Abba", ritmo: "PhillyDisco", interprete: "Mujer" },
+  { cancion: "Danza Kuduro/Taboo", artista: "Don Omar ft. Lucenzo", ritmo: "ReggaetonDJ", interprete: "Hombre" },
+  { cancion: "Daria", artista: "La Quinta Estacion", ritmo: "CanadianRock", interprete: "Mujer" },
+  { cancion: "Darte un Beso", artista: "Prince Royce", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Days of Wine and Roses", artista: "Standard", ritmo: null, interprete: "Instrumental (Jazz)" },
+  { cancion: "De los Besos que te Di", artista: "Christian Nodal", ritmo: "MariachiPolca", interprete: "Hombre" },
+  { cancion: "De mi Enamórate", artista: "Daniela Romo", ritmo: "Live8Beat", interprete: "Mujer" },
+  { cancion: "De Repente", artista: "Soraya", ritmo: "16BeatBallad", interprete: "Mujer" },
+  { cancion: "De Torreón a Lerdo", artista: "Paraiso Tropical", ritmo: "DuranguensePolca", interprete: "Instrumental" },
+  { cancion: "De una Vez", artista: "Selena Gomez", ritmo: "ReggaetonSlowJam", interprete: "Mujer" },
+  { cancion: "De Viaje", artista: "Sin Bandera", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "Decidiste Dejarme", artista: "Camila", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Deja Vu", artista: "Prince Royce ft. Shakira", ritmo: "Bachata", interprete: "Dueto" },
+  { cancion: "Déjà Vu", artista: "Olivia Rodrigo", ritmo: "IrishPopRock", interprete: "Mujer" },
+  { cancion: "Déjala Que Vuelva", artista: "Piso 21", ritmo: "ReggaetonSlowJam", interprete: "Hombre" },
+  { cancion: "Déjame Vivir", artista: "Rocio Durcal ft. Juan Gabriel", ritmo: "60sShadowedPop", interprete: "Dueto" },
+  {
+    cancion: "Déjate Llevar",
+    artista: "Juan Magan ft. Belinda, Manuel Turizo,Snova, B-Case",
+    ritmo: "Reggaeton1",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Desde el dia que te Fuiste (Without You)",
+    artista: "Il Divo",
+    ritmo: "MovieClassic",
+    interprete: "Hombre"
+  },
+  { cancion: "Desde esa Noche", artista: "Thalia ft. Maluma", ritmo: "Reggaeton2", interprete: "Dueto" },
+  { cancion: "Desde que Llegaste", artista: "La Real Sonora", ritmo: "CumbiaColombia", interprete: "Hombre" },
+  { cancion: "Desde que Llegaste/Amor del Bueno", artista: "Reily", ritmo: "LoveSong", interprete: "Hombre" },
+  {
+    cancion: "Deseos de Cosas Imposibles (Primera Fila)",
+    artista: "La Oreja de Van Gogh ft. Abel Pintos",
+    ritmo: "CountryFolk8Beat",
+    interprete: "Dueto"
+  },
+  { cancion: "Despacito", artista: "Luis Fonsi ft. Daddy Yankee", ritmo: "Reggaeton1", interprete: "Hombre" },
+  { cancion: "Después de Tanto", artista: "Napoleón", ritmo: "EasyBallad", interprete: "Hombre" },
+  { cancion: "Después de Ti Quien (acústica)", artista: "La Adictiva", ritmo: "UnpluggedBallad", interprete: "Hombre" },
+  { cancion: "Después de Ti... ¿Qué?", artista: "Pandora", ritmo: "Country8Beat3", interprete: "Mujer" },
+  { cancion: "Día de Enero", artista: "Shakira", ritmo: "Easy8Beat", interprete: "Mujer" },
+  { cancion: "Diamonds", artista: "Rihanna", ritmo: "UK Soul", interprete: "Mujer" },
+  { cancion: "Días Felices", artista: "El Poder de Zacatecas", ritmo: "DuranguensePolca", interprete: "Instrumental" },
+  { cancion: "Díganle", artista: "La Real Sonora", ritmo: "CumbiaColombia", interprete: "Hombre" },
+  { cancion: "Dime", artista: "Julion Alvarez", ritmo: "BaladaBanda 12-8", interprete: "Hombre" },
+  {
+    cancion: "Dime Como Quieres",
+    artista: "Christian Nodal ft. Angela Aguilar",
+    ritmo: "BoleroRancheroExp",
+    interprete: "Dueto"
+  },
+  { cancion: "Directo al Corazón", artista: "Pepe Aguilar", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  {
+    cancion: "Disco Medley (I Will Survive/Funk Town/Last Dance/The Hustle/On the Radio)",
+    artista: "Selena",
+    ritmo: "70sDisco2",
+    interprete: "Mujer"
+  },
+  { cancion: "Disculpe Usted", artista: "Los Humildes", ritmo: "Norteña 3-4", interprete: "Hombre" },
+  { cancion: "Donde Estabas Tú", artista: "Vega ft. Ivan Ferreiro", ritmo: "BoyBandBallad", interprete: "Dueto" },
+  { cancion: "Don't Speak", artista: "No Doubt", ritmo: "UK SoftRock", interprete: "Mujer" },
+  { cancion: "Don't Start Now", artista: "Dua Lipa", ritmo: "90sDisco", interprete: "Mujer" },
+  { cancion: "Don't Stop Believin'", artista: "Journey", ritmo: null, interprete: null },
+  { cancion: "Don't Wanna Know", artista: "Maroon 5", ritmo: "Chillout2", interprete: "Hombre" },
+  {
+    cancion: "Don't you Worry Child",
+    artista: "Swedish House Mafia ft. John Martin",
+    ritmo: "BigRoom",
+    interprete: "Hombre"
+  },
+  { cancion: "Dos Cosas", artista: "Los Bribones", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Dreaming of You", artista: "Selena", ritmo: null, interprete: null },
+  { cancion: "Dreams", artista: "Fleetwood Mac", ritmo: "VintageGuitarPop", interprete: "Mujer" },
+  { cancion: "Dreams", artista: "The Cranberries", ritmo: "80sRockDiva", interprete: "Mujer" },
+  { cancion: "Drive my Car", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "Drivers License", artista: "Olivia Rodrigo", ritmo: "CountryPopDuo", interprete: "Mujer" },
+  { cancion: "Duele el Amor", artista: "Aleks Syntek ft. Ana Torroja", ritmo: "Country8Beat2", interprete: "Dueto" },
+  { cancion: "Dueles", artista: "Jesse & Joy", ritmo: "60sVintageRock", interprete: "Mujer" },
+  { cancion: "Dust in the Wind", artista: "Kansas", ritmo: "UnpluggedPop", interprete: "Hombre" },
+  { cancion: "Dynamite", artista: "BTS", ritmo: null, interprete: null },
+  { cancion: "Easy on Me", artista: "Adele", ritmo: "GospelBallad", interprete: "Mujer" },
+  { cancion: "Ecos de Amor", artista: "Jesse & Joy", ritmo: "6-8BalladRock", interprete: "Mujer" },
+  { cancion: "El Abandonado", artista: "Elefante", ritmo: "PhillyDisco", interprete: "Hombre" },
+  { cancion: "El Alma en Pie", artista: "Yahir ft. Yuridia", ritmo: "70sChartBallad", interprete: "Dueto" },
+  { cancion: "El Amor", artista: "Tito el Bambino", ritmo: "SalsaGranCiclon", interprete: "Hombre" },
+  { cancion: "El Amor Acaba", artista: "José José", ritmo: "8BeatAdria", interprete: "Hombre" },
+  { cancion: "El Amor de Mi Vida", artista: "Camilo Sesto", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "El Amor Manda", artista: "Maria Jose", ritmo: "60sBigHit", interprete: "Mujer" },
+  {
+    cancion: "El Botecito/Tao Tao",
+    artista: "Los Hijos del Pueblo/Control",
+    ritmo: "CumbiaTexana",
+    interprete: "Hombre"
+  },
+  { cancion: "El Botones", artista: "La Sonora Santanera", ritmo: "SonoraCumbia", interprete: "Hombre" },
+  {
+    cancion: "El Breve Espacio en que no Estás",
+    artista: "Pablo Milanes",
+    ritmo: "Balada Acústica",
+    interprete: "Hombre"
+  },
+  { cancion: "El Camaleón", artista: "Los Diferentes de la Sierra", ritmo: "CumbiadelNorte", interprete: "Hombre" },
+  { cancion: "El Cariño Que Perdí", artista: "Los Freddy's", ritmo: "Classic8Beat", interprete: "Hombre" },
+  { cancion: "El Chico del Apartamento 512", artista: "Selena", ritmo: null, interprete: "Mujer" },
+  { cancion: "El Coco No", artista: "Roberto Junior y su Bandeño", ritmo: "BandenoRapido", interprete: "Hombre" },
+  { cancion: "El Color de tus Ojos", artista: "Banda MS", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  {
+    cancion: "El Corazón de Texas",
+    artista: "El Poder de Zacatecas",
+    ritmo: "Norteña 2-4",
+    interprete: "Instrumental"
+  },
+  { cancion: "El Día que me Quieras", artista: "Carlos Gardel", ritmo: "TangoFlamencos", interprete: "Hombre" },
+  {
+    cancion: "El Duelo (unplugged)",
+    artista: "La Ley ft. Ely Guerra",
+    ritmo: "R&B SlowBallad/CanadianRock",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "El Eco de tu Voz, El Eco de tu Voz (Primera Fila)",
+    artista: "Playa Limbo",
+    ritmo: "80sGuitarPop",
+    interprete: "Mujer"
+  },
+  { cancion: "El Espejo", artista: "Yuri", ritmo: "PopLatinBallad", interprete: "Mujer" },
+  {
+    cancion: "El Ladrón",
+    artista: "La Sonora Santanera ft. Julieta Venegas",
+    ritmo: "CumbiaPeru",
+    interprete: "Mujer"
+  },
+  { cancion: "El Listón de tu Pelo", artista: "Los Angeles Azules", ritmo: "Grupera", interprete: "Dueto" },
+  { cancion: "El Loco", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Dueto" },
+  { cancion: "El Mariachi Loco", artista: "Pedro Fernandez", ritmo: "MariachiCumbia", interprete: "Hombre" },
+  { cancion: "El Mismo Aire", artista: "Camilo ft. Pablo Alborán", ritmo: "LatinBoyBand", interprete: "Hombre" },
+  { cancion: "El Muchacho de los Ojos Tristes", artista: "Jeanette", ritmo: "EasyPop", interprete: "Mujer" },
+  { cancion: "El Mudo", artista: "La Sonora Santanera", ritmo: "SonoraCumbia", interprete: "Hombre" },
+  { cancion: "El Nido", artista: "Sonia Lopez ft. La Sonora Santanera", ritmo: "SonoraCumbia", interprete: "Mujer" },
+  { cancion: "El Noa Noa", artista: "Juan Gabriel", ritmo: "60sVintageRock", interprete: "Hombre" },
+  { cancion: "El Palomito", artista: "Los Cadetes de Linares", ritmo: "Norteño 2-4", interprete: "Hombre" },
+  { cancion: "El Pastor", artista: "Mariachi Vargas de Tecalitlán", ritmo: "MariHuapango", interprete: "Hombre" },
+  { cancion: "El Perdedor", artista: "Enrique Iglesias ft. Marco Antonio Solís", ritmo: null, interprete: null },
+  { cancion: "El Poder de tu Amor", artista: "Ricardo Montaner", ritmo: "SlowBallad", interprete: "Hombre" },
+  { cancion: "El Portón", artista: "Roberto Carlos", ritmo: "16BeatBallad", interprete: "Hombre" },
+  {
+    cancion: "El Primer día del Resto de mi Vida",
+    artista: "La Oreja de Van Gogh",
+    ritmo: "JazzFusion",
+    interprete: "Mujer"
+  },
+  { cancion: "El Próximo Viernes", artista: "Thalía", ritmo: "HappyReggae", interprete: "Mujer" },
+  { cancion: "El Ratico", artista: "Juanes ft. Kali Uchis", ritmo: "SheriffReggae", interprete: "Dueto" },
+  { cancion: "El Reloj", artista: "Luis Miguel ", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "El Rey", artista: "Jose Alfredo Jimenez", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "El Sauce y la Palma", artista: "Banda MM", ritmo: "Banda 2-4Polca", interprete: "Instrumental" },
+  { cancion: "El Sinaloense", artista: "Banda MM", ritmo: "Banda Zapateado", interprete: "Instrumental" },
+  { cancion: "El Sol no Regresa", artista: "La Quinta Estacion", ritmo: "Country8Beat3", interprete: "Mujer" },
+  { cancion: "El Tiempo de Ti", artista: "Playa Limbo", ritmo: "12-8PopBallad", interprete: "Mujer" },
+  { cancion: "El Triste", artista: "Yuri", ritmo: "6-8GuitarBallad", interprete: "Mujer" },
+  { cancion: "El Uno Para el Otro", artista: "Tercer Cielo", ritmo: "ModernPopBld", interprete: "Dueto" },
+  { cancion: "El Vals de las Mariposas", artista: "Danny Daniel", ritmo: null, interprete: "Instrumental (Vals)" },
+  { cancion: "Ella Es", artista: "Leonel García", ritmo: "EasyListening", interprete: "Hombre" },
+  { cancion: "Ella es mi Fiesta", artista: "Carlos Vives", ritmo: "VallenatoFiesta", interprete: "Hombre" },
+  { cancion: "En Cambio No", artista: "Laura Pausini", ritmo: "PowerBallad", interprete: "Mujer" },
+  { cancion: "En el 2000", artista: "Natalia Lafourcade", ritmo: "90sGuitarPop", interprete: "Mujer" },
+  { cancion: "En Esta No", artista: "Sin Bandera", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "En Mi, No en Ti", artista: "Vazquez Sound", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "En Realidad", artista: "Abracadabra", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "En su Lugar", artista: "Yuridia", ritmo: "6-8SoulBallad", interprete: "Mujer" },
+  { cancion: "Entra en mi Vida", artista: "Sin Bandera", ritmo: "WorshipSlow", interprete: "Hombre" },
+  { cancion: "Entrega de Amor", artista: "Los Ángeles Azules", ritmo: "Grupera", interprete: "Hombre" },
+  { cancion: "Entrega Total", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Épocas de Sol", artista: "Jorge Duarte", ritmo: "Classic8Beat", interprete: "Hombre" },
+  { cancion: "Equivocada", artista: "Thalia", ritmo: "CountryBallad1", interprete: "Mujer" },
+  { cancion: "Eres", artista: "Café Tacvba", ritmo: "AcousticRock", interprete: "Hombre" },
+  {
+    cancion: "Eres mi Droga/Se va Muriendo mi Alma/Belleza de Cantina",
+    artista: "Intocable/Los Sembradores/Los Cardenales de Nuevo Leon",
+    ritmo: "Norteña2-4",
+    interprete: "Hombre"
+  },
+  { cancion: "Eres mi Religion", artista: "Maná", ritmo: "UK SoftRock", interprete: "Hombre" },
+  { cancion: "Eres Mía", artista: "Romeo Santos", ritmo: "BachataNueva", interprete: "Hombre" },
+  { cancion: "Eres Para Mí", artista: "Julieta Venegas", ritmo: "KoolSuffle", interprete: "Mujer" },
+  { cancion: "Eres Tú", artista: "Matisse ft. Reik", ritmo: "SlowBallad", interprete: "Dueto" },
+  {
+    cancion: "Es Mejor Así (Primera Fila)",
+    artista: "Cristian Castro ft. Reik",
+    ritmo: "70sHardRock",
+    interprete: "Hombre"
+  },
+  { cancion: "Es Por Ti", artista: "Complices", ritmo: "Country8Beat3", interprete: "Hombre" },
+  { cancion: "Esa Chica es Mía", artista: "Sergio Dalma", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  { cancion: "Escándalo", artista: "Sonora Dinamita", ritmo: "CumbiaColombiaExp", interprete: "Mujer" },
+  { cancion: "Escarcha", artista: "Agustín Lara", ritmo: "BigBandBolero", interprete: "Hombre" },
+  { cancion: "Esclavo y Amo", artista: "Pepe Aguilar", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Eslabón por Eslabón", artista: "Los Invasores de Nuevo León", ritmo: null, interprete: null },
+  { cancion: "Espacio Sideral", artista: "Jesse & Joy", ritmo: "CountryStrummin'", interprete: "Mujer" },
+  { cancion: "Esperaré", artista: "Armando Manzanero", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Esta Tarde vi Llover", artista: "Armando Manzanero", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Estar Contigo", artista: "Alex Ubago ft. Lena Orge", ritmo: "UK SoftRock", interprete: "Dueto" },
+  { cancion: "Este Mundo Sin Ti", artista: "Los Claxons", ritmo: "HappyReggae", interprete: "Hombre" },
+  { cancion: "Estés en Donde Estés", artista: "Ha-Ash", ritmo: "70sHardRock", interprete: "Mujer" },
+  {
+    cancion: "Estos Celos (Primera Fila)",
+    artista: "Vicente Fernandez",
+    ritmo: "MariachiCumbia",
+    interprete: "Hombre"
+  },
+  { cancion: "Estoy Enamorada", artista: "Thalía ft. Pedro Capó", ritmo: "PopLatinBallad", interprete: "Dueto" },
+  { cancion: "Estoy Pensando en Ti", artista: "Agustín Lara", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Eternamente Bella", artista: "Alejandra Guzmán", ritmo: null, interprete: null },
+  {
+    cancion: "Europa (Earth's Cry Heaven's Smile)",
+    artista: "Carlos Santana",
+    ritmo: "60sOrganBallad",
+    interprete: "Instrumental"
+  },
+  { cancion: "Every Breath You Take", artista: "The Police", ritmo: "Country8Beat3", interprete: "Hombre" },
+  { cancion: "Every Rose has it's Thorn", artista: "Poison", ritmo: "OrchRockBallad", interprete: "Hombre" },
+  { cancion: "Every Woman in the World", artista: "Air Supply", ritmo: "70sPopDuo", interprete: "Hombre" },
+  { cancion: "Everything I Wanted", artista: "Billie Eilish", ritmo: "EDM Anthem", interprete: "Mujer" },
+  { cancion: "Ex de Verdad", artista: "Ha-Ash", ritmo: "Classic8Beat", interprete: "Mujer" },
+  { cancion: "Ex's & Oh's", artista: "Elle King", ritmo: "70sShuffleRock", interprete: "Mujer" },
+  { cancion: "Faded", artista: "Alan Walker", ritmo: "NatureHipHop", interprete: "Mujer" },
+  { cancion: "Faithfully", artista: "Journey", ritmo: null, interprete: null },
+  { cancion: "Fascinacion", artista: "Carlos Rivera", ritmo: "Cool8Beat", interprete: "Hombre" },
+  { cancion: "Favorito", artista: "Camilo", ritmo: "ReggaetonMedio", interprete: "Hombre" },
+  {
+    cancion: "Feels",
+    artista: "Calvin Harris ft. Pharell Williams, Katy Perry & Big Sean",
+    ritmo: "FunkPop",
+    interprete: "Dueto"
+  },
+  { cancion: "Felices los 4", artista: "Maluma", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  { cancion: "Find U Again", artista: "Mark Ronson ft. Camila Cabello", ritmo: "PhillyDisco", interprete: "Mujer" },
+  { cancion: "Firework", artista: "Katy Perry", ritmo: "DangerDance", interprete: "Mujer" },
+  { cancion: "Fix You", artista: "Coldplay", ritmo: "UK FolkPop", interprete: "Hombre" },
+  { cancion: "Flightless Bird, American Mouth", artista: "Iron & Wine", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Flor de Capomo", artista: "Pesado", ritmo: "Norteña 2-4", interprete: "Hombre" },
+  { cancion: "Flowers", artista: "Miley Cyrus", ritmo: null, interprete: null },
+  { cancion: "Fly me to the Moon", artista: "Frank Sinatra", ritmo: "BigBandSwing", interprete: "Instrumental (Jazz)" },
+  { cancion: "Forgiven", artista: "Within Temptation", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Fotos y Recuerdos", artista: "Selena", ritmo: null, interprete: "Mujer" },
+  { cancion: "Frenesi", artista: "Linda Ronstadt", ritmo: "Cha-Cha", interprete: "Mujer" },
+  { cancion: "Fría Como el Viento", artista: "Luis Miguel ", ritmo: "PianoBallad", interprete: "Hombre" },
+  {
+    cancion: "From This Moment On",
+    artista: "Shania Twain ft. Bryan White",
+    ritmo: "VocalPopBallad",
+    interprete: "Dueto"
+  },
+  { cancion: "Fue un Placer Conocerte", artista: "Rocio Durcal", ritmo: "BoleroMariachi", interprete: "Mujer" },
+  { cancion: "Fuego en el Fuego", artista: "Eros Ramazzotti", ritmo: "Up-tempo8Beat", interprete: "Hombre" },
+  { cancion: "Fuentes de Ortiz", artista: "Ed Maverick", ritmo: "UnpluggedPop", interprete: "Hombre" },
+  { cancion: "Fuiste Mala", artista: "Kumbia Kings ft. Intocable", ritmo: "CumbiaNrteLent", interprete: "Hombre" },
+  { cancion: "Fuiste Tú", artista: "Ricardo Arjona ft. Gaby Moreno", ritmo: "LoveSong", interprete: "Dueto" },
+  { cancion: "Gallito Feliz", artista: "Cristian Castro", ritmo: "CumbiaTropical", interprete: "Hombre" },
+  { cancion: "Game of Thrones", artista: "Ramin Djawadi", ritmo: null, interprete: null },
+  { cancion: "Gavilán o Paloma", artista: "José José", ritmo: "CountryBallad3", interprete: "Hombre" },
+  { cancion: "Gema", artista: "Carlos Cuevas", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Generación Timbiriche", artista: "Grupo Latino", ritmo: "80sPowerRock", interprete: "Hombre" },
+  {
+    cancion: "Get Lucky",
+    artista: "Daft Punk ft. Pharrel Williams, Nile Rodgers",
+    ritmo: "70sDiscoFunk",
+    interprete: "Hombre"
+  },
+  { cancion: "Gimme! Gimme! Gimme! (A man After Midnight)", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Girl on Fire", artista: "Alicia Keys", ritmo: "BoyBandPop", interprete: "Mujer" },
+  { cancion: "Girls Just Want to Have Fun", artista: "Cyndi Lauper", ritmo: null, interprete: null },
+  { cancion: "Give me Love", artista: "Ed Sheeran", ritmo: "6-8GuitarBallad", interprete: "Hombre" },
+  {
+    cancion: "Gladiator - The Battle (Excerpts)",
+    artista: "Hans Zimmer",
+    ritmo: "Instrumental",
+    interprete: "Instrumental"
+  },
+  {
+    cancion: "Golpes en el Corazón",
+    artista: "Los Tigres del Norte ft. Paulina Rubio",
+    ritmo: "BaladaGrupera",
+    interprete: "Dueto"
+  },
+  { cancion: "Good 4 U", artista: "Olivia Rodrigo", ritmo: "CanadianRock", interprete: "Mujer" },
+  { cancion: "Good Thing", artista: "Sam Smith", ritmo: null, interprete: null },
+  { cancion: "Gracias a Ti (Himno del Teletón)", artista: "Vazquez Sound", ritmo: "UkulelePop", interprete: "Mujer" },
+  {
+    cancion: "Gracias por tu Amor",
+    artista: "Banda el Recodo ft. David Bisbal",
+    ritmo: "Banda El Recodo ft. David Bisbal",
+    interprete: "Hombre"
+  },
+  { cancion: "Habitame Siempre", artista: "Thalia", ritmo: "VocalPopBallad", interprete: "Mujer" },
+  { cancion: "Hábito de Ti", artista: "María José ft. Vanesa Martín", ritmo: "16BeatRock", interprete: "Mujer" },
+  { cancion: "Háblame de Ti", artista: "Reik", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Hablemos", artista: "Ariel Camacho", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  { cancion: "Hacer el Amor con Otro", artista: "Alejandra Guzmán", ritmo: "PianoBallad", interprete: "Mujer" },
+  { cancion: "Half Time", artista: "Amy Winehouse", ritmo: "Easy8Beat", interprete: "Mujer" },
+  { cancion: "Hallelujah", artista: "Leonard Cohen", ritmo: "6-8ChartBallad", interprete: "Hombre" },
+  { cancion: "Halo", artista: "Beyonce", ritmo: "NatureHipHop", interprete: "Mujer" },
+  { cancion: "Hard to Say I'm Sorry", artista: "Chicago", ritmo: "70sChartBallad", interprete: "Hombre" },
+  { cancion: "Harder to Breathe", artista: "Maroon5", ritmo: "16BeatRock", interprete: "Hombre" },
+  { cancion: "Hasta la Raiz", artista: "Natalia Lafourcade", ritmo: "RumbaFlamenco", interprete: "Mujer" },
+  { cancion: "Hasta mi Final", artista: "Il Divo", ritmo: "OrchMovieBallad", interprete: "Hombre" },
+  { cancion: "Havana", artista: "Camila Cabello ft. Young Thug", ritmo: "MotorCity", interprete: "Mujer" },
+  {
+    cancion: "Have you Ever Seen the Rain",
+    artista: "Creedence Clearwater Revival",
+    ritmo: "VintageGtrPop",
+    interprete: "Hombre"
+  },
+  { cancion: "Hawái", artista: "Maluma", ritmo: "ReggaetonPop", interprete: "Hombre" },
+  { cancion: "Heaven", artista: "Bryan Adams", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Hello", artista: "Adele", ritmo: "SongwriterBallad", interprete: "Mujer" },
+  { cancion: "Help!", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "Hermoso Cariño", artista: "Vicente Fernandez", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "Hero", artista: "Enrique Iglesias", ritmo: "IrishPopBallad", interprete: "Hombre" },
+  { cancion: "Heroe", artista: "Il Divo", ritmo: "OrchMovieBallad", interprete: "Hombre" },
+  { cancion: "Hey Brother", artista: "AVICII", ritmo: "ElecCity", interprete: "Hombre" },
+  { cancion: "Hey Jude", artista: "The Beatles", ritmo: "LoveBallad", interprete: "Hombre" },
+  { cancion: "Historia de un Amor", artista: "Luis Miguel", ritmo: "OrchBolero", interprete: "Hombre" },
+  { cancion: "Hold the Line", artista: " Toto", ritmo: null, interprete: null },
+  { cancion: "Honesty", artista: "Billy Joel", ritmo: "70sChartBallad", interprete: "Hombre" },
+  { cancion: "Hot N Cold", artista: "Katy Perry", ritmo: "DreamDance", interprete: "Mujer" },
+  { cancion: "Hotel California", artista: "The Eagles", ritmo: "UnpluggedBallad", interprete: "Hombre" },
+  {
+    cancion: "Household of Faith",
+    artista: "Steve Green ft. Marijean Green. (John Rosasco)",
+    ritmo: null,
+    interprete: "Dueto"
+  },
+  { cancion: "How Deep is Your Love", artista: "Bee Gees", ritmo: "Cool8Beat", interprete: "Hombre" },
+  {
+    cancion: "Hoy Tengo Ganas de Ti",
+    artista: "Alejadnro Fernández ft. Christina Aguilera",
+    ritmo: "PowerBallad",
+    interprete: "Dueto"
+  },
+  { cancion: "Hoy Tengo que Decirte Papá", artista: "Timbiriche", ritmo: "80sGuitarPop", interprete: "Dueto" },
+  { cancion: "Hoy ya me Voy", artista: "Kanny Garcia", ritmo: "PopEvergreen", interprete: "Mujer" },
+  { cancion: "Humanos a Marte", artista: "Chayanne", ritmo: "UkuleleWay", interprete: "Hombre" },
+  { cancion: "I Don't Want to Miss a Thing", artista: "Aerosmith", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "I Dreamed a Dream", artista: "Les Misérables", ritmo: "Instrumental", interprete: "Mujer" },
+  { cancion: "I Just Called to Say I Love You", artista: "Stevie Wonder", ritmo: "Wonder8Beat", interprete: "Hombre" },
+  { cancion: "I Put Spell on You", artista: "Annie Lennox", ritmo: "SlowBlues", interprete: "Mujer" },
+  { cancion: "I Took a Pill in Ibiza", artista: "Mike Posner", ritmo: "CountryBallad1", interprete: "Hombre" },
+  { cancion: "I Want it That Way", artista: "Backstreet Boys", ritmo: "US SingerPop", interprete: "Hombre" },
+  { cancion: "I Want to Break Free", artista: "Queen", ritmo: null, interprete: null },
+  { cancion: "I Want You (She's so Heavy)", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "I Will Always Love You", artista: "Whitney Houston", ritmo: "BroadwayBallad", interprete: "Mujer" },
+  { cancion: "I Will Survive", artista: "Gloria Gaynor", ritmo: "DiscoSurvival", interprete: "Mujer" },
+  { cancion: "I Won't Give Up", artista: "Jason Mraz", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "IDGAF", artista: "Dua Lipa", ritmo: "PopR&B", interprete: "Mujer" },
+  {
+    cancion: "idontwannabeyouanymore/Love on the Brain",
+    artista: "Billie Eilish/Rihanna",
+    ritmo: "6-8BalladRock",
+    interprete: "Mujer"
+  },
+  { cancion: "If I Ain't got You", artista: "Alicia Keys", ritmo: "6-8SoulBallad", interprete: "Mujer" },
+  { cancion: "If you Leave me Now", artista: "Chicago", ritmo: "Easy8Beat", interprete: "Hombre" },
+  { cancion: "I'll Be There for You", artista: "Bon Jovi", ritmo: "OrchRockBallad2", interprete: "Hombre" },
+  { cancion: "I'll Never Love Again", artista: "Lady Gaga", ritmo: "SlowBallad", interprete: "Mujer" },
+  { cancion: "I'm Not the Only One", artista: "Sam Smith", ritmo: "CoolR&B", interprete: "Hombre" },
+  { cancion: "I'm Yours", artista: "Jason Mraz", ritmo: "UkuleleWay", interprete: "Hombre" },
+  { cancion: "Imaginarte", artista: "Playa Limbo", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  { cancion: "Imagine", artista: "John Lennon", ritmo: "LoveSong", interprete: "Hombre" },
+  { cancion: "In a Little While", artista: "U2", ritmo: "AcousticRock", interprete: "Hombre" },
+  { cancion: "In my Place", artista: "Coldplay", ritmo: "CountryPopDuo", interprete: "Hombre" },
+  { cancion: "Indigo", artista: "Camilo ft. Evaluna Montaner", ritmo: "Country8Beat3", interprete: "Dueto" },
+  { cancion: "Inevitable", artista: "Shakira", ritmo: "AcousticRock", interprete: "Mujer" },
+  { cancion: "Inolvidable", artista: "Laura Pausini", ritmo: "LoveSong", interprete: "Mujer" },
+  { cancion: "Inolvidable", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Inspiración", artista: "Benny Ibarra", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Intentalo (Me Prende)",
+    artista: "3BallMty ft. America Sierra & El Bebeto ",
+    ritmo: "CumbiaTribal",
+    interprete: "Hombre"
+  },
+  { cancion: "Interrogación", artista: "Carlos Cuevas", ritmo: "Rumba", interprete: "Hombre" },
+  { cancion: "Invéntame", artista: "Mon Laferte", ritmo: "8BeatAdria", interprete: "Mujer" },
+  { cancion: "Invierno Triste", artista: "Laura Denisse", ritmo: "LovelyShuffle", interprete: "Mujer" },
+  { cancion: "Iris", artista: "The Goo Goo Dolls", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Irremediable", artista: "Yurida", ritmo: "LoveSong", interprete: "Mujer" },
+  { cancion: "It's a Heartache", artista: "Bonnie Tyler", ritmo: "VintageGtrPop", interprete: "Mujer" },
+  { cancion: "It's my Life", artista: "Bon Jovi", ritmo: "PowerRock", interprete: "Hombre" },
+  { cancion: "Jacaranda", artista: "Carlos Cuevas", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Jacinto Cenobio", artista: "Guadalupe Pineda", ritmo: "MariachiWaltz", interprete: "Mujer" },
+  { cancion: "Jealous", artista: "Labrinth", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Jealous Guy", artista: "John Lennon", ritmo: null, interprete: null },
+  { cancion: "Jueves", artista: "La Oreja de Van Gogh", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Junto a Ti", artista: "Alex Sirvent ft. Ximena Herrera", ritmo: "PianoBallad", interprete: "Dueto" },
+  { cancion: "Just the Way you Are", artista: "Billy Joel", ritmo: "70sChartBallad", interprete: "Hombre" },
+  { cancion: "Karma Police", artista: "Radiohead", ritmo: null, interprete: "Hombre" },
+  { cancion: "Killing me Softly (with his Song)", artista: "Roberta Flack", ritmo: "BossaBrazil", interprete: "Dueto" },
+  { cancion: "Kilometros", artista: "Sin Bandera", ritmo: "WorshipSlow", interprete: "Hombre" },
+  { cancion: "Kiss Me", artista: "Sixpence None the Richer", ritmo: "UKSoftRock", interprete: "Mujer" },
+  { cancion: "Kiss me More", artista: "Doja Cat ft. SZA", ritmo: "DiscoChocolate", interprete: "Mujer" },
+  { cancion: "Kiss of Fire (Tango)", artista: "Standard", ritmo: "Tango", interprete: "Instrumental (Tango)" },
+  { cancion: "Knockin' Heaven's Door", artista: "Bob Dylan", ritmo: "UnpluggedBallad", interprete: "Hombre" },
+  { cancion: "Kumbala", artista: "La Maldita Vecindad", ritmo: "Danzon", interprete: "Hombre" },
+  { cancion: "La Bachata", artista: "MTZ Manuel Turizo", ritmo: null, interprete: null },
+  { cancion: "La Bala", artista: "Pedro Fernandez", ritmo: "MariachiCumbia", interprete: "Hombre" },
+  { cancion: "La Bamba", artista: "Ritchie Valens", ritmo: "RockCha-Cha", interprete: "Hombre" },
+  { cancion: "La Barca", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "La Bella y la Bestia", artista: "Disney", ritmo: null, interprete: "Mujer" },
+  { cancion: "La Bicicleta", artista: "Carlos Vives ft. Shakira", ritmo: "ReggaetonPop", interprete: "Dueto" },
+  { cancion: "La Bikina", artista: "Karol Sevilla", ritmo: "Mariachi Son", interprete: "Mujer" },
+  { cancion: "La Bilirubina", artista: "El Orkeston Loko", ritmo: "MerengueExp", interprete: "Hombre" },
+  { cancion: "La Boa", artista: "La Sonora Santanera ft. Roco", ritmo: "PopCha-Cha", interprete: "Hombre" },
+  { cancion: "La Botella", artista: "Mach & Daddy", ritmo: "ReggaetonRapido", interprete: "Hombre" },
+  {
+    cancion: "La Cacahuata",
+    artista: "Los Montañeses del Alamo",
+    ritmo: "DuranguensePolca",
+    interprete: "Instrumental (Polca)"
+  },
+  {
+    cancion: "La Capsula",
+    artista: "El Poder de Zacatecas",
+    ritmo: "DuranguensePolca",
+    interprete: "Instrumental (Polca)"
+  },
+  { cancion: "La Carcacha", artista: "Selena", ritmo: "CumbiaNova", interprete: "Mujer" },
+  { cancion: "La Chica de Humo", artista: "Emmanuel", ritmo: "FunkyShuffle", interprete: "Hombre" },
+  { cancion: "La Chica Yeyé", artista: "Ole Ole", ritmo: "Rock&Roll", interprete: "Mujer" },
+  { cancion: "La Chona", artista: "Los Tucanes de Tijuana", ritmo: "CumbiaDelNorte", interprete: "Hombre" },
+  { cancion: "La Colegiala", artista: "Calo ft. Margarita la Diosa de la Cumbia", ritmo: null, interprete: "Dueto" },
+  { cancion: "La Cosa más Bella", artista: "Eros Ramazzotti", ritmo: "80sGuitarPop", interprete: "Hombre" },
+  { cancion: "La Cumparsita (Tango)", artista: "Julio Iglesias", ritmo: "Tango", interprete: "Instrumental (Jazz)" },
+  { cancion: "La de la Mala Suerte", artista: "Jesse & Joy", ritmo: "LoveSong", interprete: "Mujer" },
+  {
+    cancion: "La Diferencia/Acá Entre Nos",
+    artista: "Vicente Fernandez",
+    ritmo: "Mariachi 2-4 Lento",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "La Distancia es como el Viento",
+    artista: "Domenico Modugno",
+    ritmo: "CountrySwing",
+    interprete: "Hombre"
+  },
+  { cancion: "La Flaca", artista: "Jarabe de Palo", ritmo: "RockCha-Cha", interprete: "Hombre" },
+  {
+    cancion: "La Frase Tonta de la Semana",
+    artista: "La Quinta Estacion",
+    ritmo: "SongwriterBallad",
+    interprete: "Mujer"
+  },
+  { cancion: "La Gata Bajo la Lluvia", artista: "Rocío Dúrcal", ritmo: "8BeatAdria", interprete: "Mujer" },
+  { cancion: "La Gloria de Dios", artista: "Ricardo Montaner", ritmo: "12-8PopBallad", interprete: "Dueto" },
+  { cancion: "La Gloria Eres Tú", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "La Guarecita", artista: "José Luis Gazcon", ritmo: "Tierra2-4", interprete: "Hombre" },
+  { cancion: "La Hierba se Movia", artista: "Tropicalisimo Apache", ritmo: "CumbiaSureste", interprete: "Hombre" },
+  { cancion: "La Incondicional", artista: "Luis Miguel", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  { cancion: "La Isla Bonita", artista: "Madonna", ritmo: "JazzSamba", interprete: "Mujer" },
+  { cancion: "La Jaiba", artista: "Los Karkis", ritmo: "Charanga", interprete: "Hombre" },
+  {
+    cancion: "La Ley del Monte (Primera Fila)",
+    artista: "Vicente Fernandez",
+    ritmo: "MariachiPolca",
+    interprete: "Hombre"
+  },
+  { cancion: "La Llorona", artista: "Chavela Vargas", ritmo: "MariachiWalzSlow", interprete: "Mujer" },
+  { cancion: "La Luz", artista: "Juanes", ritmo: "EuroTrance", interprete: "Hombre" },
+  { cancion: "La Malagueña", artista: "Mariachi Vargas de Tecalitlán", ritmo: "MariHuapango", interprete: "Hombre" },
+  { cancion: "La Maldita Primavera", artista: "Yuridia", ritmo: "6-8ChartBallad", interprete: "Mujer" },
+  { cancion: "La Mentira", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "La Misma Luna", artista: "Matisse", ritmo: null, interprete: "Dueto" },
+  {
+    cancion: "La Misma Luna/Por Última Vez",
+    artista: "Matisse",
+    ritmo: "WorshipSlow, Balada Acústica",
+    interprete: "Dueto"
+  },
+  { cancion: "La Monja se Esconde", artista: "Genaro El Consentido", ritmo: null, interprete: null },
+  { cancion: "La Mordidita", artista: "Ricky Martin ft. Yotuel", ritmo: "ReggaetonDJ", interprete: "Hombre" },
+  { cancion: "La Nave del Olvido", artista: "José José", ritmo: "BigBandBallad", interprete: "Hombre" },
+  { cancion: "La Negra Tomasa", artista: "Caifanes", ritmo: "PopCumbia", interprete: "Hombre" },
+  { cancion: "La Noche", artista: "Gloria Trevi", ritmo: "60sVintageRock", interprete: "Mujer" },
+  { cancion: "La Ocasión Para Amarnos", artista: "María José", ritmo: "80sPowerRock", interprete: "Mujer" },
+  { cancion: "La Otra Parte de Ti", artista: "Jorge Muñiz", ritmo: "PopCha-Cha", interprete: "Hombre" },
+  { cancion: "La Pared", artista: "Shakira", ritmo: "BritRockPop", interprete: "Mujer" },
+  {
+    cancion: "La Peinada (La Peinadita)/La María",
+    artista: "Chuy Lizarraga/Julión Alvarez",
+    ritmo: "QuebraditaAcst",
+    interprete: "Hombre"
+  },
+  { cancion: "La Planta", artista: "Caos", ritmo: "70sHardRock", interprete: "Hombre" },
+  {
+    cancion: "La Playa (Primera Fila)",
+    artista: "La Oreja de Van Gogh ft. Leonel García",
+    ritmo: "80sPopBallad",
+    interprete: "Dueto"
+  },
+  { cancion: "La Posibilidad", artista: "Los Claxons", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "La Puerta", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "La Que me Gusta", artista: "Los Amigos Invisibles", ritmo: "60s8Beat", interprete: "Hombre" },
+  {
+    cancion: "La Revolcada",
+    artista: "El Poder de Zacatecas",
+    ritmo: "DurangoPolca",
+    interprete: "Instrumental (Polca)"
+  },
+  { cancion: "La Sanadora", artista: "Marco Mares", ritmo: null, interprete: null },
+  { cancion: "La Suegra", artista: "Banda Machos", ritmo: "CumbiaBanda Med", interprete: "Hombre" },
+  { cancion: "La Trampa", artista: "Ana Barbara", ritmo: "CumbiaPeru", interprete: "Mujer" },
+  { cancion: "La Ultima Muñeca", artista: "Rafael Alejandro", ritmo: "FinalWaltz", interprete: "Hombre" },
+  { cancion: "La Ventanita", artista: "Garibaldi", ritmo: "MerengueExp", interprete: "Dueto" },
+  { cancion: "La Vida Despues de Ti", artista: "Lu", ritmo: "UK SoftRock", interprete: "Dueto" },
+  { cancion: "La Vida es un Carnaval", artista: "Celia Cruz", ritmo: null, interprete: "Mujer" },
+  { cancion: "La Vie en Rose", artista: "Edith Piaf ", ritmo: "BigBandBallad", interprete: "Mujer" },
+  { cancion: "La Yaquesita", artista: "Los Viejones de Linares", ritmo: "CumbiaDelNorte", interprete: "Hombre" },
+  { cancion: "Lágrimas Negras", artista: "Carlos Cuevas ft. Lila Downs", ritmo: "BigBandBolero", interprete: "Dueto" },
+  { cancion: "Lamento", artista: "Gian Marco", ritmo: "ModernPopBallad", interprete: "Hombre" },
+  { cancion: "Las 17:00", artista: "Pablo Lopez", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Las Golondrinas",
+    artista: "Mariachi Vargas de Tecalitlán",
+    ritmo: "BoleroMariachi",
+    interprete: "Hombre"
+  },
+  { cancion: "Las Luces de Nueva York", artista: "La Sonora Santanera", ritmo: "Sonora", interprete: "Hombre" },
+  { cancion: "Las Mil y una Noches (Primera Fila)", artista: "Flans", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  {
+    cancion: "Las Mulas de Moreno",
+    artista: "Julion Alvarez y su Norteño Banda",
+    ritmo: "CumbiaBanda Med",
+    interprete: "Hombre"
+  },
+  { cancion: "Las Piedras Rodantes", artista: "El Tri", ritmo: "WestCoastPop", interprete: "Hombre" },
+  { cancion: "Las Tres Tumbas", artista: "Los Cadetes de Linares", ritmo: "Norteña 3-4", interprete: "Hombre" },
+  { cancion: "Last Kiss", artista: "Pearl Jam", ritmo: "60sShadowedPop", interprete: "Hombre" },
+  { cancion: "Late Night Talking", artista: "Harry Styles", ritmo: null, interprete: null },
+  { cancion: "Laurita Garza", artista: "Pesado", ritmo: "Norteña 3-4", interprete: "Hombre" },
+  { cancion: "Lay me Down", artista: "Sam Smith ft. John Legend", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Lean On", artista: "Major Lazer ft. MO, DJ Snake", ritmo: "GlobalDJ's", interprete: "Mujer" },
+  {
+    cancion: "Leave the Door Open",
+    artista: "Bruno Mars ft. Anderson Paak, Silk Sonic",
+    ritmo: "SoulBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "Lento", artista: "Julieta Venegas", ritmo: "CaliforniaCountry", interprete: "Mujer" },
+  { cancion: "Let Her Go", artista: "Passenger", ritmo: "ContempGrtPop", interprete: "Hombre" },
+  {
+    cancion: "Let it Be",
+    artista: "The Beatles, Vazquez Sound",
+    ritmo: "PianoBallad, VocalPopBallad",
+    interprete: "Mujer"
+  },
+  { cancion: "Let me Love You", artista: "DJ Snake ft. Justin Bieber", ritmo: "HipHop", interprete: "Hombre" },
+  { cancion: "Levitating", artista: "Dua Lipa", ritmo: "DanceFloor", interprete: "Mujer" },
+  { cancion: "Life for Rent", artista: "Dido", ritmo: "UK SoftRock", interprete: "Mujer" },
+  {
+    cancion: "Like I'm Gonna Lose You",
+    artista: "Meghan Trainor ft. John Legend",
+    ritmo: "6-8SoulBallad",
+    interprete: "Dueto"
+  },
+  { cancion: "Limón y Sal", artista: "Julieta Venegas", ritmo: "ScandShuffle", interprete: "Mujer" },
+  { cancion: "Linger", artista: "The Cranberries", ritmo: "90sGuitarPop", interprete: "Mujer" },
+  { cancion: "Listen Before I Go", artista: "Billie Eilish", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Livin' on a Prayer", artista: "Bon Jovi", ritmo: "80sPowerRock", interprete: "Hombre" },
+  { cancion: "Llegaste Tú", artista: "Jesse & Joy", ritmo: "ContempGrtPop", interprete: "Mujer" },
+  { cancion: "Llegaste Tú", artista: "Luis Fonsi ft. Juan Luis Guerra", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Llorando se Fue", artista: "Tropicalisimo Apache", ritmo: "SambaReggae", interprete: "Hombre" },
+  { cancion: "Llorar", artista: "Jesse & Joy ft. Mario Domm", ritmo: "6-8ChartBallad", interprete: "Dueto" },
+  { cancion: "Llorar Duele Más", artista: "Kalimba", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Lo Aprendí de Ti", artista: "Ha-Ash", ritmo: "CountryBallad3", interprete: "Mujer" },
+  { cancion: "Lo Busqué", artista: "Ana Barbara", ritmo: "CountryRock", interprete: "Mujer" },
+  { cancion: "Lo Intentamos", artista: "Espinoza Paz", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  { cancion: "Lo Juro por mi Vida", artista: "Grupo Lluvia", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  { cancion: "Lo Pasado Pasado", artista: "José José", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  { cancion: "Lo que no fue no Será", artista: "José José", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "Loca", artista: "Aleks Syntek", ritmo: "FunkPopRock", interprete: "Hombre" },
+  {
+    cancion: "Locked Out of Heaven/Treasure/Uptown Funk",
+    artista: "Bruno Mars",
+    ritmo: "70sStraightRock, Mr.Soul, FunkPop",
+    interprete: "Hombre"
+  },
+  { cancion: "Loco", artista: "Alejandro Fernández", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  {
+    cancion: "Loco (Tu Forma de Ser)",
+    artista: "Los Autenticos Decadentes ft. Ruben Albarran",
+    ritmo: "PopBossa",
+    interprete: "Hombre"
+  },
+  { cancion: "Los Luchadores", artista: "La Sonora Santanera", ritmo: "CumbiaPeru", interprete: "Hombre" },
+  { cancion: "Lost on You", artista: "LP", ritmo: "80sPopBallad", interprete: "Mujer" },
+  { cancion: "Love", artista: "Zoe", ritmo: "00sBoyBand", interprete: "Hombre" },
+  { cancion: "L-O-V-E", artista: "Nat King Cole", ritmo: "JazzGuitarClub", interprete: "Hombre" },
+  { cancion: "Love Again", artista: "Dua Lipa", ritmo: "Slow'n'Swingin'", interprete: "Mujer" },
+  { cancion: "Love Hurts", artista: "Joan Jett & The Blackhearts", ritmo: "60sBigHit", interprete: "Mujer" },
+  { cancion: "Love me Like You Do", artista: "Ellie Goulding", ritmo: "NatureHipHop", interprete: "Mujer" },
+  { cancion: "Love of my Life", artista: "Queen", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Love Story", artista: "Taylor Swift", ritmo: "NashvillePop", interprete: "Mujer" },
+  {
+    cancion: "Love Story (Historia de un Amor)",
+    artista: "Standard",
+    ritmo: "Acoustic8BtBallad",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Love Theme from The Godfather",
+    artista: "Standard",
+    ritmo: "Balada Acústica",
+    interprete: "Instrumental"
+  },
+  {
+    cancion: "Love You Like a Love Song",
+    artista: "Selena Gomez & The Scene",
+    ritmo: "RetroDance",
+    interprete: "Mujer"
+  },
+  { cancion: "Love Yourself", artista: "Justin Bieber", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Lovely", artista: "Billie Eilish ft. Khalid", ritmo: "Balada Acústica", interprete: "Dueto" },
+  { cancion: "Lovumba", artista: "Daddy Yankee", ritmo: "ReggaetonPop", interprete: "Hombre" },
+  { cancion: "Lucky", artista: "Jason Mraz ft. Colbie Caillat", ritmo: "CountryBallad3", interprete: "Dueto" },
+  { cancion: "Luna (Unplugged)", artista: "Zoe", ritmo: "Orchestral6-8", interprete: "Hombre" },
+  { cancion: "Luto En Mi Alma", artista: "Los Terricolas", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Luz de Día", artista: "Los Enanitos Verdes", ritmo: null, interprete: "Hombre" },
+  { cancion: "Magia Negra", artista: "Tropicalisimo Apache", ritmo: null, interprete: null },
+  { cancion: "Make it to Me", artista: "Sam Smith", ritmo: "GospelBallad", interprete: "Hombre" },
+  { cancion: "Make You Feel my Love", artista: "Adele", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Makes me Wonder", artista: "Maroon 5", ritmo: null, interprete: null },
+  { cancion: "Maldito Piano", artista: "Los Ángeles Negros", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Mamma Mia", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Man I Feel Like a Woman", artista: "Shania Twain", ritmo: "BluesShuffle", interprete: "Mujer" },
+  { cancion: "Manias", artista: "Thalia", ritmo: "CountryBallad3", interprete: "Mujer" },
+  { cancion: "Mañana, Mañana (Primera Fila)", artista: "Cristian Castro", ritmo: "Live8Beat", interprete: "Hombre" },
+  { cancion: "María José", artista: "Juan Gabriel", ritmo: "SpanishPaso", interprete: "Hombre" },
+  { cancion: "Mas que Amigos", artista: "Matisse", ritmo: "FunkPopRock", interprete: "Dueto" },
+  { cancion: "Mas que Amor", artista: "Il Volo", ritmo: "BroadwayBallad", interprete: "Hombre" },
+  {
+    cancion: "Mas que Suerte",
+    artista: "Beatriz Luengo ft. Jesus Navarro",
+    ritmo: "SongwriterBallad",
+    interprete: "Dueto"
+  },
+  { cancion: "Más que tu Amigo", artista: "Marco Antonio Solís", ritmo: null, interprete: null },
+  { cancion: "Mátalas", artista: "Alejandro Fernández", ritmo: "MariachiPolca", interprete: "Hombre" },
+  { cancion: "Material Girl", artista: "Madonna", ritmo: "SchlagerRock", interprete: "Mujer" },
+  { cancion: "Me Cambiaste la Vida", artista: "Río Roma", ritmo: "LoveSong", interprete: "Hombre" },
+  { cancion: "Me Cuesta tanto Olvidarte", artista: "Mecano", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Me Dediqué a Perderte", artista: "Alejandro Fernández", ritmo: "SongwriterBallad", interprete: "Hombre" },
+  { cancion: "Me Dijeron de Pequeño", artista: "Manuel Carrasco", ritmo: "GospelBallad", interprete: "Hombre" },
+  { cancion: "Me Enamoré", artista: "Shakira", ritmo: "ReggaetonPop", interprete: "Mujer" },
+  { cancion: "Me Enamore de Ti", artista: "Chayanne", ritmo: "SongwriterBallad", interprete: "Hombre" },
+  { cancion: "Me Encantas", artista: "Pedro Fernandez", ritmo: "MariachiCumbia", interprete: "Hombre" },
+  { cancion: "Me Estoy Enamorando", artista: "La Mafia", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Me Estoy Volviendo Loca", artista: "Timbiriche", ritmo: "80sPowerRock", interprete: "Mujer" },
+  { cancion: "Me Faltabas Tú", artista: "José A. Mendez", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Me Gustas Mucho", artista: "Rocío Dúrcal", ritmo: "MariachiPolca", interprete: "Mujer" },
+  { cancion: "Me Llamas", artista: "José Luis Perales", ritmo: "60sShadowedPop", interprete: "Hombre" },
+  { cancion: "Me Llamas", artista: "Piso 21", ritmo: "ReggaetonSlowJam", interprete: "Hombre" },
+  { cancion: "Me Muero", artista: "La Quinta Estacion", ritmo: "Live8Beat", interprete: "Mujer" },
+  { cancion: "Me Muero Contigo", artista: "Los Claxons", ritmo: "ContempGrtPop", interprete: "Hombre" },
+  { cancion: "Me Nace del Corazón", artista: "Rocio Durcal", ritmo: "MariachiSon", interprete: "Mujer" },
+  { cancion: "Me Olvidarás", artista: "Yuridia", ritmo: "PowerBallad", interprete: "Mujer" },
+  { cancion: "Me Pregunto", artista: "Belanova", ritmo: "80sTeenDisco", interprete: "Mujer" },
+  { cancion: "Me vas a Extrañar", artista: "Banda MS", ritmo: "BaladaBanda 12-8", interprete: "Hombre" },
+  { cancion: "Me Voy", artista: "Julieta Venegas", ritmo: "SchlagerWaltz", interprete: "Mujer" },
+  { cancion: "Me voy a Ir", artista: "Jenny and the Mexicats", ritmo: "PopCumbia", interprete: "Mujer" },
+  { cancion: "Memories", artista: "Maroon 5", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Memory (Cats)", artista: "Barbra Streisand, Andrew Lloyd Webber", ritmo: null, interprete: "Mujer" },
+  { cancion: "Mercy", artista: "Shawn Mendes", ritmo: null, interprete: null },
+  { cancion: "México (en Vivo)", artista: "Timbiriche", ritmo: "GermanRock", interprete: "Dueto" },
+  { cancion: "Mi Buen Amor", artista: "Mon Laferte ft. Enrique Bunbury", ritmo: "6-8SoulBallad", interprete: "Dueto" },
+  { cancion: "Mi Casa Nueva", artista: "Pesado", ritmo: "Norteña 2-4", interprete: "Hombre" },
+  { cancion: "Mi Complice", artista: "Los Cardenales de Nuevo Leon", ritmo: "Norteño 2-4", interprete: "Hombre" },
+  { cancion: "Mi Corazón Encantado", artista: "Dragon Ball GT", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Mi Credo (MTV Unplugged)", artista: "Pepe Aguilar", ritmo: "CountryBallad2", interprete: "Hombre" },
+  { cancion: "Mi Cucu", artista: "La Sonora Dinamita", ritmo: "CumbiaSureste", interprete: "Dueto" },
+  { cancion: "Mi Error mi Fantasia", artista: "Edith Marquez", ritmo: "BoleroLento", interprete: "Mujer" },
+  {
+    cancion: "Mi Forma de Sentir",
+    artista: "La Revolución de Emiliano Zapata",
+    ritmo: "16BeatBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "Mi Gusto Es", artista: "Banda el Recodo", ritmo: "Banda 3-4 Acst", interprete: "Hombre" },
+  {
+    cancion: "Mi Historia Entre tus Dedos",
+    artista: "Gianluca Grignani",
+    ritmo: "SmoothPopBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "Mi Lupita", artista: "Pito Perez", ritmo: "GrungeRock", interprete: "Hombre" },
+  { cancion: "Mi Mayor Anhelo", artista: "Banda MS", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  { cancion: "Mi Niña Mujer", artista: "Los Angeles Azules ft. Ha-Ash", ritmo: "CumbiaNova", interprete: "Mujer" },
+  { cancion: "Mi Peor Error", artista: "Alejandra Guzmán", ritmo: "IrishPopBallad", interprete: "Mujer" },
+  { cancion: "Mi Perdición", artista: "Playa Limbo", ritmo: "LiveSoulBand", interprete: "Mujer" },
+  { cancion: "Mi Persona Favorita", artista: "Rio Roma", ritmo: "UkuleleWay", interprete: "Hombre" },
+  { cancion: "Mi Piquito de Oro", artista: "Ramon Ayala", ritmo: "Norteña 2-4", interprete: "Hombre" },
+  { cancion: "Mi Primer Amor", artista: "Jose Augusto", ritmo: "Orchestral6-8", interprete: "Hombre" },
+  { cancion: "Mi Primer Día Sin Ti", artista: "Enanitos Verdes", ritmo: "UK SoftRock", interprete: "Hombre" },
+  { cancion: "Mi Primer Millón", artista: "Bacilos", ritmo: "ReggaetonRapido", interprete: "Hombre" },
+  { cancion: "Mi Razon de Ser", artista: "Banda Ms", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  { cancion: "Mi Vida sin Ti", artista: "Jesus Adrian Romero", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "Mía", artista: "Benny Ibarra", ritmo: "6-8SoulBallad", interprete: "Hombre" },
+  { cancion: "Midnight Train", artista: "Sam Smith", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Miedo (MTV Unplugged)",
+    artista: "Pepe Aguilar ft. Natalia Lafourcade",
+    ritmo: "PopEvergreen",
+    interprete: "Dueto"
+  },
+  { cancion: "Mientes", artista: "Camila", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Mientes tan Bien", artista: "Sin Bandera", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Mil Besos", artista: "Los Bribones", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Mil Horas", artista: "La Sonora Dinamita", ritmo: null, interprete: null },
+  { cancion: "Million Reasons", artista: "Lady Gaga", ritmo: "GospelBallad", interprete: "Mujer" },
+  { cancion: "Mirala Miralo", artista: "Alejandra Guzmán", ritmo: "80sPowerRock", interprete: "Mujer" },
+  { cancion: "Mírame (Cuestión de Tiempo)", artista: "Timbiriche", ritmo: "CountryPopDuo", interprete: "Mujer" },
+  { cancion: "Mirando una Estrella", artista: "Billy Vaugun", ritmo: "EasySwing", interprete: "Hombre" },
+  { cancion: "Mis Ojos Lloran Por Ti", artista: "Big Boy ft. Ángel López", ritmo: "Reggaeton2", interprete: "Hombre" },
+  {
+    cancion: "Mis Sentimientos",
+    artista: "Los Angeles Azules ft. Ximena Sariñana",
+    ritmo: "CumbiaNova",
+    interprete: "Mujer"
+  },
+  { cancion: "Misty", artista: "Ella Fitzgerald (Standard)", ritmo: null, interprete: "Instrumental (Jazz)" },
+  { cancion: "Moliendo Café", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Mon Amour", artista: "Zzoilo ft. Aitana", ritmo: "YoungFox", interprete: "Dueto" },
+  { cancion: "Moon River", artista: "Henry Mancini", ritmo: "SlowJazzWaltz", interprete: "Instrumental" },
+  { cancion: "More Than Words", artista: "Extreme", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "MorenaMia", artista: "Miguel Bose ft. Julieta Venegas", ritmo: "ClubReggaeton", interprete: "Dueto" },
+  { cancion: "Mori", artista: "Tranzas", ritmo: "Acoustic8BtBld", interprete: "Hombre" },
+  { cancion: "Motivos", artista: "Luis Miguel", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Moves Like Jagger", artista: "Maroon 5 ft. Christina Aguilera", ritmo: null, interprete: null },
+  { cancion: "Muchachita Linda", artista: "Juan Luis Guerra", ritmo: "PopBachata", interprete: "Hombre" },
+  { cancion: "Mujer Contra Mujer", artista: "Mecano", ritmo: "Acoustic8BtBld", interprete: "Mujer" },
+  { cancion: "Mujeres Divinas", artista: "Vicente Fernandez", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "Muñeca de Ojos de Miel", artista: "Los Mier", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Murder on the Dance Floor", artista: "Sophie Elis-Bextor", ritmo: "ChartEDM", interprete: "Mujer" },
+  { cancion: "Muriendo Lento", artista: "Moderatto ft. Belinda", ritmo: "70sHardRock", interprete: "Dueto" },
+  { cancion: "My Heart Will go On (Titanic)", artista: "Celine Dion", ritmo: "OrchMovieBallad", interprete: "Mujer" },
+  { cancion: "My Immortal", artista: "Evanescence", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "My Way", artista: "Frank Sinatra", ritmo: "LoveSong", interprete: "Hombre" },
+  { cancion: "N Otra Vida", artista: "Edgar Oceransky", ritmo: "Acoustic8BtBallad", interprete: "Hombre" },
+  { cancion: "Na Na Na (Dulce Niña)", artista: "Kumbia Kings", ritmo: null, interprete: null },
+  {
+    cancion: "Na Na Na (Dulce Niña)/Sabes a Chocolate/Chiquilla",
+    artista: "Kumbia Kings/Kumbia All Starz",
+    ritmo: "CumbiaBolivia/CumbiaReggae",
+    interprete: "Hombre"
+  },
+  { cancion: "Nace un Borracho", artista: "Christian Nodal", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "Nada", artista: "Zoe", ritmo: "NashvillePop", interprete: "Hombre" },
+  { cancion: "Nada de Más", artista: "Belanova", ritmo: "90sDancePop", interprete: "Mujer" },
+  { cancion: "Nada es Igual", artista: "Belanova", ritmo: "90sDancePop", interprete: "Mujer" },
+  {
+    cancion: "Nada fue un Error",
+    artista: "Coti ft. Paulina Rubio y Julieta Venegas",
+    ritmo: "80sPowerRock",
+    interprete: "Dueto"
+  },
+  { cancion: "Nada Personal", artista: "Armando Manzanero ft. Lisset", ritmo: "90sSmoothBallad", interprete: "Dueto" },
+  { cancion: "Nadie te Ama Como Yo", artista: "Martin Valverde", ritmo: "WorshipSlow", interprete: "Hombre" },
+  {
+    cancion: "Necesito Decirtelo",
+    artista: "Los Cardenales de Nuevo Leon",
+    ritmo: "Norteño 2-4",
+    interprete: "Hombre"
+  },
+  { cancion: "Negrura", artista: "Los Dandys", ritmo: "BoleroTrio", interprete: "Hombre" },
+  {
+    cancion: "Never Enough (The Greatest Showman)",
+    artista: "Loren Allred",
+    ritmo: "MovieBallad",
+    interprete: "Mujer"
+  },
+  { cancion: "Never Say Goodbye", artista: "Bon Jovi", ritmo: "OrchRockBallad1", interprete: "Hombre" },
+  { cancion: "Ni tú ni Nadie", artista: "Alaska y Dinarama", ritmo: "SwedishPopShuffle", interprete: "Hombre" },
+  { cancion: "Niña Bonita", artista: "Chino & Nacho", ritmo: null, interprete: null },
+  { cancion: "No", artista: "Shakira", ritmo: "UnpluggedPop", interprete: "Mujer" },
+  { cancion: "No Crezcas Mas", artista: "Tercer Cielo", ritmo: "LoveSong", interprete: "Hombre" },
+  {
+    cancion: "No Debes Tener dos Amores",
+    artista: "Coque Muñiz ft. Carlos Cuevas",
+    ritmo: "BoleroLento",
+    interprete: "Hombre"
+  },
+  { cancion: "No Dejes Que", artista: "Caifanes", ritmo: "CanadianRock", interprete: "Hombre" },
+  { cancion: "No Desaparecerá", artista: "Reik", ritmo: "6-8SoulBallad", interprete: "Hombre" },
+  { cancion: "No Eras Para Mi", artista: "Carlos Rivera", ritmo: "SongwriterBallad", interprete: "Hombre" },
+  { cancion: "No Hay Nadie Mas", artista: "Sebastian Yatra", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "No Huyas de Mi", artista: "Kenny y los Electricos", ritmo: "PowerRock", interprete: "Mujer" },
+  { cancion: "No Llega el Olvido", artista: "Jenni Rivera", ritmo: "Mariachi 2-4 Lento", interprete: "Mujer" },
+  { cancion: "No me Ames", artista: "Jennifer Lopez ft. Marc Anthony", ritmo: "SalsaNYC", interprete: "Dueto" },
+  { cancion: "No me Destruyas", artista: "Zoe", ritmo: "60sVintageRock", interprete: "Hombre" },
+  { cancion: "No me Digas Que No", artista: "Nikki Clan", ritmo: "PowerRock", interprete: "Dueto" },
+  { cancion: "No me Digas Que No", artista: "Sonora Kaliente", ritmo: "CumbiaColombia", interprete: "Hombre" },
+  { cancion: "No me Enseñaste", artista: "Thalía", ritmo: "90sSmoothBallad", interprete: "Mujer" },
+  { cancion: "No me Platiques Mas", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "No me Quiero Enamorar", artista: "Edgar Oceransky", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "No Podrás", artista: "Cristian Castro", ritmo: "80sGuitarPop", interprete: "Hombre" },
+  { cancion: "No Podrás", artista: "Moderatto", ritmo: "80sPowerRock", interprete: "Hombre" },
+  {
+    cancion: "No Rompas mi Corazón/Arriba y Abajo/Payaso de Rodeo",
+    artista: "Caballo Dorado",
+    ritmo: "CountryRock/CountryShuffle",
+    interprete: "Hombre"
+  },
+  { cancion: "No Sé", artista: "Margarita la Diosa de la Cumbia", ritmo: null, interprete: null },
+  { cancion: "No Se Han Ido del Todo", artista: "Martin Valverde", ritmo: "Worship6-8", interprete: "Hombre" },
+  { cancion: "No sé si es Amor", artista: "Timbiriche", ritmo: "StandardRock", interprete: "Dueto" },
+  { cancion: "No Sé Tú", artista: "Luis Miguel", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "No Seas Tan Cruel", artista: "Timbiriche", ritmo: "80sGuitarPop", interprete: "Dueto" },
+  { cancion: "No soy de Aquí ni soy de Allá", artista: "Alberto Cortez", ritmo: "EasyBallad", interprete: "Hombre" },
+  { cancion: "No te Apartes de Mí", artista: "Yahir", ritmo: "Cool8Beat", interprete: "Hombre" },
+  { cancion: "No te Olvidaré", artista: "Gloria Estefan", ritmo: "BroadwayBallad", interprete: "Mujer" },
+  {
+    cancion: "No te voy a Perdonar",
+    artista: "Grupo Cañaveral ft. María León",
+    ritmo: "CumbiaNova",
+    interprete: "Mujer"
+  },
+  { cancion: "No Tengo Dinero", artista: "Kumbia Kings", ritmo: "KumbiaKings", interprete: "Hombre" },
+  { cancion: "No Veo La Hora", artista: "Noel Schajris", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "Nobleza", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  {
+    cancion: "Nos Siguen Pegando Abajo (Pecado Mortal)",
+    artista: "Charly Garcia",
+    ritmo: "70sStraightRock",
+    interprete: "Hombre"
+  },
+  { cancion: "Nosotros", artista: "Luis Miguel", ritmo: "FunkyShuffle", interprete: "Hombre" },
+  { cancion: "Not in That Way", artista: "Sam Smith", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Not Just You", artista: "Cody Simson", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  {
+    cancion: "Nothing Breaks Like a Heart",
+    artista: "Mark Ronson ft. Miley Cyrus",
+    ritmo: "ElectroHouse",
+    interprete: "Mujer"
+  },
+  { cancion: "Noviembre sin Ti", artista: "Reik", ritmo: "ModernPopBallad", interprete: "Hombre" },
+  { cancion: "Nube Gris", artista: "Margarita la Diosa de la Cumbia", ritmo: null, interprete: null },
+  { cancion: "Nube Viajera", artista: "Alejandro Fernández", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  {
+    cancion: "Nunca es Suficiente",
+    artista: "Los Angeles Azules ft. Natalia Lafourcade",
+    ritmo: "CumbiaNova",
+    interprete: "Mujer"
+  },
+  { cancion: "Nunca es Suficiente", artista: "Natalia Lafourcade", ritmo: "SingalongPiano", interprete: "Mujer" },
+  { cancion: "Nunca Supe mas de Ti", artista: "Sergio Dennis", ritmo: "VocalPopBallad", interprete: "Hombre" },
+  { cancion: "Nunca Voy a Olvidarte", artista: "Cristian Castro", ritmo: "OrchRockBallad", interprete: "Hombre" },
+  { cancion: "O Sole Mio", artista: "Andrea Bocelli", ritmo: "Instrumental", interprete: "Instrumental" },
+  { cancion: "Ocean Eyes", artista: "Billie Eilish", ritmo: "Chillout2", interprete: "Mujer" },
+  { cancion: "Ódiame", artista: "Charlie Zaa", ritmo: "MariachiWaltz", interprete: "Hombre" },
+  { cancion: "Odio Amarte", artista: "Ha-Ash", ritmo: "70sShuffleRock", interprete: "Mujer" },
+  { cancion: "Oh! Darling", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "Oh, Pretty Woman", artista: "Roy Orbison", ritmo: "60sSuperGroup", interprete: "Hombre" },
+  { cancion: "Ojalá", artista: "Baileys", ritmo: null, interprete: "Mujer" },
+  { cancion: "Ojalá que te Mueras", artista: "Pesado", ritmo: "Norteño 2-4", interprete: "Hombre" },
+  { cancion: "Ojos Marrones", artista: "Lasso ft. Sebastian Yatra", ritmo: null, interprete: null },
+  { cancion: "Ojos Noche", artista: "Elsa y Elmar ft. Carla Morrison", ritmo: "Country8Beat3", interprete: "Mujer" },
+  { cancion: "Olfato Femenino", artista: "Aroma", ritmo: "CumbiaColombia", interprete: "Mujer" },
+  {
+    cancion: "Olvidame y Pega la Vuelta",
+    artista: "Jennifer Lopez ft. Marc Anthony",
+    ritmo: "90sAussiePop",
+    interprete: "Dueto"
+  },
+  { cancion: "One and Only", artista: "Adele", ritmo: "6-8SoulBallad", interprete: "Mujer" },
+  { cancion: "One Kiss", artista: "Calvin Harris ft. Dua Lipa", ritmo: "MinimalElectro", interprete: "Mujer" },
+  { cancion: "One More Night", artista: "Maroon 5", ritmo: "FunkPopRock", interprete: "Hombre" },
+  { cancion: "Only Human", artista: "Jonas Brothers", ritmo: "FunkyShuffle", interprete: "Hombre" },
+  { cancion: "Only Time", artista: "Enya", ritmo: "ChillPerformer", interprete: "Mujer" },
+  { cancion: "Only You (and you Alone)", artista: "The Platters", ritmo: "60sBigHit", interprete: "Hombre" },
+  { cancion: "Open Arms", artista: "Journey", ritmo: "6-8BalladRock", interprete: "Hombre" },
+  { cancion: "Otra como Tú", artista: "Eros Ramazzotti", ritmo: "90sGuitarPop", interprete: "Hombre" },
+  { cancion: "Otras Vidas", artista: "Carlos Rivera", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "Oye", artista: "La Sonora Dinamita", ritmo: null, interprete: null },
+  { cancion: "Oye Como Va", artista: "Tito Puente (Standard)", ritmo: "RockCha-Cha", interprete: "Hombre" },
+  { cancion: "Oye Mujer", artista: "Raymix", ritmo: "CumbiaVillera", interprete: "Hombre" },
+  { cancion: "Página Blanca", artista: "Carlos Cuevas", ritmo: "BoleroTrio", interprete: "Hombre" },
+  { cancion: "Palabra de Honor", artista: "Luis Miguel", ritmo: "ContempGrtPop", interprete: "Hombre" },
+  { cancion: "Palabras Para Paula", artista: "La Oreja de Van Gogh", ritmo: "IrishPopBallad", interprete: "Mujer" },
+  { cancion: "Palace", artista: "Sam Smith", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Palmar", artista: "Caloncho ft. Mon Laferte", ritmo: "LoungeBossa", interprete: "Dueto" },
+  { cancion: "Paloma", artista: "Dani Martin", ritmo: "StadiumRock", interprete: "Hombre" },
+  { cancion: "Paloma Negra", artista: "Mariachi", ritmo: "MariachiValsSlow", interprete: "Hombre" },
+  { cancion: "Para Amarnos Más", artista: "Mijares", ritmo: "OrchRockBallad", interprete: "Hombre" },
+  { cancion: "Para Empezar", artista: "Leonel Garcia", ritmo: "CountryBallad3", interprete: "Hombre" },
+  { cancion: "Para no Verte Más", artista: "La Mosca Tse Tse", ritmo: "CountryBlues", interprete: "Hombre" },
+  { cancion: "Para Que no Me Olvides", artista: "Lorenzo Santamaria", ritmo: "8BeatAdria", interprete: "Hombre" },
+  { cancion: "Para Siempre... tal Vez", artista: "Sin Bandera", ritmo: "OrchRockBallad2", interprete: "Hombre" },
+  { cancion: "Parece Que Fue Ayer", artista: "Armando Manzanero", ritmo: "Rumba", interprete: "Hombre" },
+  { cancion: "Party Favor", artista: "Billie Eilish", ritmo: "UkuleleWay", interprete: "Mujer" },
+  { cancion: "Pasión", artista: "Sarah Brightman ft. Fernando Lima", ritmo: "OrchMovieBallad", interprete: "Dueto" },
+  { cancion: "Paula", artista: "Zoe", ritmo: "AcousticRock", interprete: "Hombre" },
+  { cancion: "Payaso", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Payaso de Rodeo", artista: "Caballo Dorado", ritmo: null, interprete: null },
+  { cancion: "Payphone", artista: "Maroon 5", ritmo: "16BeatRock", interprete: "Hombre" },
+  { cancion: "Peaches", artista: "Jack Black - Super Mario Bros", ritmo: null, interprete: null },
+  { cancion: "Pégate (MTV Unplugged)", artista: "Ricky Martin", ritmo: "Axe", interprete: "Hombre" },
+  { cancion: "Penélope", artista: "Diego Torres", ritmo: "90s8BeatBallad", interprete: "Hombre" },
+  { cancion: "Pensamiento", artista: "Hermanoz Martinez Gil", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Perderte de Nuevo", artista: "Camila", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Perdición", artista: "La Quinta Estación", ritmo: "IrishPopBallad", interprete: "Mujer" },
+  { cancion: "Perdón", artista: "Pambo", ritmo: "PianoBallad", interprete: "Mujer" },
+  { cancion: "Perdón, Perdón", artista: "Ha-Ash", ritmo: "PowerBallad", interprete: "Mujer" },
+  { cancion: "Perdóname", artista: "Yahir", ritmo: "OrchRockBallad2", interprete: "Hombre" },
+  { cancion: "Perfect", artista: "Ed Sheeran", ritmo: "6-8ChartBallad", interprete: "Hombre" },
+  { cancion: "Perfect Strangers", artista: "Jonas Blue ft. JP Cooper", ritmo: "Slow'n'Swingin'", interprete: "Hombre" },
+  { cancion: "Perfecta", artista: "Miranda", ritmo: "CountryFolkUpbeat", interprete: "Dueto" },
+  { cancion: "Perfidia", artista: "Standard", ritmo: "PopCha-Cha", interprete: "Instrumental" },
+  {
+    cancion: "Perfume de Gardenias/Las Luces de Nueva York",
+    artista: "La Sonora Santanera",
+    ritmo: "Sonora",
+    interprete: "Hombre"
+  },
+  { cancion: "Permission to Dance", artista: "BTS", ritmo: "90sDisco", interprete: "Hombre" },
+  { cancion: "Pero esa vez Lloré", artista: "Leo Dan", ritmo: "60sShadowedPop", interprete: "Hombre" },
+  { cancion: "Pero me Acuerdo de Ti", artista: "Christina Aguilera", ritmo: "OrchRockBallad1", interprete: "Mujer" },
+  { cancion: "Photograph", artista: "Ed Sheeran", ritmo: "90sGuitarPop", interprete: "Hombre" },
+  { cancion: "Physical", artista: "Dua Lipa", ritmo: "60sVintageRock", interprete: "Mujer" },
+  { cancion: "Piano", artista: "Bebu Silvetti", ritmo: "PianoBallad", interprete: "Instrumental" },
+  { cancion: "Piano Man", artista: "Billy Joel", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Piel Canela", artista: "Chucho Valdés", ritmo: "PopCha-Cha", interprete: "Dueto" },
+  { cancion: "Piel de Ángel", artista: "Camilo Sesto", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  { cancion: "Piensa en Mí", artista: "Luz Casal", ritmo: "BoleroTrio", interprete: "Mujer" },
+  { cancion: "Pienso en Ti", artista: "Adrianna Foster", ritmo: "Orchestral6-8", interprete: "Mujer" },
+  { cancion: "Plural Siendo Singular", artista: "Jose Madero", ritmo: "CountryFolk8Beat", interprete: "Hombre" },
+  { cancion: "Poco", artista: "Reik ft. Christian Nodal", ritmo: "BoleroRancheroExp", interprete: "Hombre" },
+  {
+    cancion: "Popurrí Alejandra Guzmán (Eternamente Bella/Mirala Miralo/Un Grito en la Noche)",
+    artista: "Alejandra Guzmán/Moderatto",
+    ritmo: "80sPowerRock",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurrí Chicos de Barrio (Yo te Invito a Bailar/En tu Corazón/El Ladrón/Pachuco/El Baile del Gavilán",
+    artista: "Grupo Signos",
+    ritmo: "CumbiaSonidera",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Popurrí de Huapangos (La Loba, El Pavido Navido, El Coyote)",
+    artista: "Los Buitres de Culiacán",
+    ritmo: null,
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurrí de Manzanero (Somos Novios/ Contigo Aprendí/Adoro/ Mía/Voy a Apagar la Luz/Esta Tarde vi Llover)",
+    artista: "Carlos Cuevas",
+    ritmo: "BoleroLento",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurrí Javier Solis (Sombras/Llorarás, Llorarás/Entrega Total)",
+    artista: "Javier Solis",
+    ritmo: "BoleroRancheroExp",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurrí José José (Desesperado/Lo Dudo/Lo que no fue no Será)",
+    artista: "Yahir",
+    ritmo: "90sRockBallad",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurri La Sonora Dinamita (Que Nadie Sepa mi Sufrir/Escándalo/Que Bello)",
+    artista: "Sonora Dinamita",
+    ritmo: "CumbiaColombiaExp",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurri La Sonora Dinamita 2 Oye/Se me Perdió la Cadenita/Mil Horas",
+    artista: "Sonora Dinamita/Sonora Tropicana",
+    ritmo: "CumbiaSureste",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Popurri Lagunero (Magia Negra/Mi Cucu/Capullo y Sorullo/Cinco de Té)",
+    artista: "Tropicalísimo Apache/La Sonora Dinamita",
+    ritmo: "CumbiaSureste",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Popurri Laura Pausini (Víveme/En Cambio No/Amores Extraños/La Soledad)",
+    artista: "Laura Pausini",
+    ritmo: "ModernPopBallad",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurrí Los Ángeles Azules (Como te voy a Olvidar/El Listón de tu Pelo/17 Años",
+    artista: "Los Angeles Azules",
+    ritmo: "Grupera",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Popurri Luis Miguel (La Chica del Bikini Azul/Ahora te Puedes Marchar/Cuando Calienta el Sol)",
+    artista: "Luis Miguel",
+    ritmo: "CanadianRock",
+    interprete: "Hombre"
+  },
+  {
+    cancion:
+      "Popurri Marco Antonio Solís (Donde Estará mi Primavera/Mi Mayor Necesidad/Mi Mayor Sacrificio/Tu Cárcel/Si no te Hubieras Ido/Más que tu Amigo)",
+    artista: "Marco Antonio Solis",
+    ritmo: "8BeatAdria",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurri Margarita (Se me Cansó el Corazón, No Sé, Nube Gris)",
+    artista: "Margarita la Diosa de la Cumbia",
+    ritmo: "CumbiaColombia",
+    interprete: null
+  },
+  {
+    cancion: "Popurri Margarita 2 (La Colegiala, Traicionero)",
+    artista: "Caló ft. Margarita la Diosa de la Cumbia",
+    ritmo: null,
+    interprete: null
+  },
+  {
+    cancion: "Popurri Merengue (La Bilirrubina/La Ventanita/Niña Bonita/Spanish Girl)",
+    artista: "El Orkeston Loco/Garibaldi/Nicho & Nacho/Amarfi",
+    ritmo: "MerengueExp",
+    interprete: "Dueto"
+  },
+  {
+    cancion: "Popurri Norteñas (Eslabón por Eslabón/Una Aventura/Voy a Llorar Por Ti/Dime Quien Es)",
+    artista: "Los Invasores del Norte/ Los Rieleros del Norte",
+    ritmo: "Norteña 2-4",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurri Pesado (Cielo Azul Cielo Nublado/Quiero Que Sepas)",
+    artista: "Pesado",
+    ritmo: "Norteña 2-4",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurri Ricardo Montaner (Tan Enamorados/Me va a Extrañar/Déjame Llorar/Hasta la Cima del Cielo)",
+    artista: "Ricardo Montaner",
+    ritmo: "LoveSong",
+    interprete: "Hombre"
+  },
+  {
+    cancion: "Popurri Selena (Como la Flor/Amor Prohibido/Fotos y Recuerdos/Bidi Boom/La Chica del Apartamento 512)",
+    artista: "Selena",
+    ritmo: "CumbiaNova",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurri Selena 2 (Baila Esta Cumbia/La Carcacha/Si una Vez)",
+    artista: "Selena",
+    ritmo: "CumbiaNova",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurri Yuridia 2 (Lo Que son las Cosas/Lo Siento mi Amor/Detrás de mi Ventana/Amiga mía)",
+    artista: "Yuridia",
+    ritmo: "LoveSong",
+    interprete: "Mujer"
+  },
+  {
+    cancion: "Popurri Yuridia Academia 2011 (Déjame Volver Contigo/Ámame/El me Mintió)",
+    artista: "Yuridia",
+    ritmo: "90s8BeatBallad",
+    interprete: "Mujer"
+  },
+  { cancion: "Por Amarte Así", artista: "Cristian Castro", ritmo: "PowerBallad", interprete: "Hombre" },
+  { cancion: "Por Besarte", artista: "Lu", ritmo: "90sGuitarPop", interprete: "Dueto" },
+  { cancion: "Por Debajo de la Mesa", artista: "Luis Miguel", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "Por eso te Amo", artista: "Rio Roma", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Por lo que Reste de Vida", artista: "Thalia", ritmo: "90sPopBallad", interprete: "Mujer" },
+  { cancion: "Por Mujeres Como Tú", artista: "Pepe Aguilar", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Por qué me Haces Llorar", artista: "Juan Gabriel", ritmo: "BoleroRancheroExp", interprete: "Hombre" },
+  { cancion: "Por qué no le Calas", artista: "Jenni Rivera", ritmo: "MariachiWaltz", interprete: "Mujer" },
+  { cancion: "Por Siempre Tú", artista: "Christina Aguilera", ritmo: "90sPopBallad", interprete: "Mujer" },
+  { cancion: "Por Ti ", artista: "Belanova", ritmo: "90sDancePop", interprete: "Mujer" },
+  { cancion: "Por ti Volaré (Con te Partirò)", artista: "Andrea Bocelli", ritmo: null, interprete: "Hombre" },
+  { cancion: "Por Última Vez", artista: "Matisse", ritmo: "Balada Acústica", interprete: "Dueto" },
+  { cancion: "Por una Cabeza", artista: "Carlos Gardel", ritmo: "Instrumental", interprete: "Instrumental (Tango)" },
+  { cancion: "Prenda Querida", artista: "Pesado", ritmo: "NorteñoClasico", interprete: "Hombre" },
+  { cancion: "Princesa Tibetana (en vivo)", artista: "Timbiriche", ritmo: "GermanRock", interprete: "Hombre" },
+  { cancion: "Princesas Mágicas", artista: "Jesus Adrian Romero", ritmo: "CountryBallad2", interprete: "Hombre" },
+  { cancion: "Probablemente", artista: "Christian Nodal", ritmo: "BoleroRancheroExp", interprete: "Hombre" },
+  { cancion: "Procura", artista: "Chi Chi Peralta", ritmo: "SalsaNYC", interprete: "Hombre" },
+  {
+    cancion: "Prometiste (Primera Fila)",
+    artista: "Pepe Aguilar ft. Melissa",
+    ritmo: "UkuleleWay",
+    interprete: "Dueto"
+  },
+  { cancion: "Propuesta Indecente", artista: "Romeo Santos", ritmo: "BachataExp", interprete: "Hombre" },
+  { cancion: "Que Agonía", artista: "Yuridia ft. Ángela Aguilar", ritmo: null, interprete: null },
+  { cancion: "Que Bello", artista: "Playa Limbo", ritmo: "80sTeenDisco", interprete: "Mujer" },
+  { cancion: "Que Bello", artista: "Sonora Dinamita ft. Kika Edgar", ritmo: "CumbiaColombia", interprete: "Mujer" },
+  { cancion: "Que Calor", artista: "SupermerK2", ritmo: "CumbiaVillera", interprete: "Hombre" },
+  { cancion: "Que Hago Yo", artista: "Ha-Ash", ritmo: "6-8GuitarBallad", interprete: "Mujer" },
+  { cancion: "Que Ironía", artista: "Alejandra Guzmán", ritmo: "6-8ChartBallad", interprete: "Mujer" },
+  {
+    cancion: "Que Lloro/Te vi Venir/Kilómetros",
+    artista: "Sin Bandera",
+    ritmo: "SongwriterBallad, Balada Acústica, WorshipSlow",
+    interprete: "Hombre"
+  },
+  { cancion: "Qué Más Puedo Pedir", artista: "Carín León", ritmo: "12-8PopBallad", interprete: "Hombre" },
+  { cancion: "Que me Alcance la Vida", artista: "Sin Bandera", ritmo: "ModernPopBallad", interprete: "Hombre" },
+  { cancion: "Que me Quedes Tú", artista: "Shakira", ritmo: "Country8Beat3", interprete: "Mujer" },
+  {
+    cancion: "Que Nadie Sepa mi Sufrir",
+    artista: "La Sonora Dinamita",
+    ritmo: "CumbiaColombiaExp",
+    interprete: "Mujer"
+  },
+  { cancion: "Qué nos Pasó?", artista: "Reily ft. Yuridia", ritmo: "PowerBallad", interprete: "Dueto" },
+  { cancion: "Qué Será de Ti?", artista: "Thalia", ritmo: "Acoustic8BtBld", interprete: "Mujer" },
+  { cancion: "Que Si", artista: "Mon Laferte", ritmo: "LoungeBossa", interprete: "Mujer" },
+  { cancion: "Qué Somos?", artista: "Playa Limbo", ritmo: "6-8BalladRock", interprete: "Mujer" },
+  { cancion: "Que te Quería", artista: "La Quinta Estacion", ritmo: "70sHardRock", interprete: "Mujer" },
+  { cancion: "Que Viva el Mambo", artista: "Grupo Latino", ritmo: "Mambo", interprete: "Hombre" },
+  { cancion: "Quedate Conmigo Esta Noche", artista: "Rocio Durcal", ritmo: "SoftSchlager", interprete: "Mujer" },
+  { cancion: "Quién Como Tú", artista: "Noel Schjaris", ritmo: "CountryRock", interprete: "Hombre" },
+  { cancion: "Quién Será", artista: "Danny Frank (Standard)", ritmo: "PopCha-Cha", interprete: "Instrumental (Jazz)" },
+  { cancion: "Quiero Estar", artista: "Edgar Oceransky", ritmo: "PianoBallad", interprete: "Hombre" },
+  { cancion: "Quiero que Sepas", artista: "Pesado", ritmo: null, interprete: null },
+  {
+    cancion: "Quizás, Quizás, Quizás",
+    artista: "Andrea Bocelli ft. Jennifer López (Standard)",
+    ritmo: "PopCha-Cha",
+    interprete: "Instrumental (Jazz)"
+  },
+  { cancion: "Rabiosa", artista: "Shakira", ritmo: "LatinPopDance", interprete: "Mujer" },
+  { cancion: "Rain on Me", artista: "Lady Gaga ft. Ariana Grande", ritmo: "90sDisco", interprete: "Mujer" },
+  { cancion: "Ramito de Violetas", artista: "Mi Banda el Mexicano", ritmo: "Quebradita", interprete: "Hombre" },
+  { cancion: "Rather Be", artista: "Clean Bandit ft. Jess Glynne", ritmo: "Ibiza2010", interprete: "Mujer" },
+  { cancion: "Rayando el Sol", artista: "Maná", ritmo: "PowerRock", interprete: "Hombre" },
+  { cancion: "Rayito de Luna", artista: "Vicente Fernández", ritmo: "ClassicBolero", interprete: "Hombre" },
+  { cancion: "Rebelde", artista: "RBD", ritmo: null, interprete: null },
+  { cancion: "Recuérdame (Coco)", artista: "Carlos Rivera", ritmo: "MovieClassic", interprete: "Hombre" },
+  { cancion: "Recuerdas", artista: "Leonel Garcia", ritmo: "UnpluggedBallad", interprete: "Hombre" },
+  { cancion: "Reggaeton Lento (Bailemos)", artista: "CNCO", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  { cancion: "Regresa a mi (Unbreak my Heart)", artista: "Il Divo", ritmo: "OrchMovieBallad", interprete: "Hombre" },
+  { cancion: "Remedy", artista: "Adele", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Rest of my Life", artista: "Bruno Mars", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Revolution", artista: "The Beatles", ritmo: null, interprete: null },
+  { cancion: "Ride", artista: "Twenty One Pilots", ritmo: "SheriffReggae", interprete: "Hombre" },
+  { cancion: "Right Here Waiting", artista: "Richard Marx", ritmo: "90sBeatBallad", interprete: "Hombre" },
+  { cancion: "Rock and Latino", artista: "Grupo Latino", ritmo: "Rock&RollJive", interprete: "Hombre" },
+  { cancion: "Rolling in the Deep", artista: "Adele", ritmo: "BritRockPop", interprete: "Mujer" },
+  { cancion: "Rosa Pastel", artista: "Belanova", ritmo: "80sClassic6-8", interprete: "Mujer" },
+  { cancion: "Rosanna", artista: "Toto", ritmo: null, interprete: null },
+  { cancion: "Rosas (Primera Fila)", artista: "La Oreja de Van Gogh", ritmo: "80sGuitarPop", interprete: "Mujer" },
+  { cancion: "Rude", artista: "Magic!", ritmo: "SheriffReggae", interprete: "Hombre" },
+  { cancion: "Rueda mi Mente", artista: "Sasha", ritmo: "IrishPopBallad", interprete: "Mujer" },
+  { cancion: "Sabes a Chocolate", artista: "Kumbia Kings", ritmo: "CumbiaBolivia", interprete: "Hombre" },
+  { cancion: "Sabor a Mi", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Sálvame", artista: "RBD", ritmo: null, interprete: null },
+  { cancion: "Santa Lucía", artista: "Miguel Ríos", ritmo: null, interprete: null },
+  {
+    cancion: "Say Something",
+    artista: "A Great Big World ft. Christina Aguilera",
+    ritmo: "Balada Acústica",
+    interprete: "Dueto"
+  },
+  { cancion: "Say You Won't Let Go", artista: "James Arthur", ritmo: "90sAussiePop", interprete: "Hombre" },
+  { cancion: "Say You, Say Me", artista: "Lionel Richie", ritmo: "90sPopBallad", interprete: "Hombre" },
+  { cancion: "Se Fue", artista: "Laura Pausini", ritmo: "80sRockDiva", interprete: "Mujer" },
+  { cancion: "Se me Antoja", artista: "Francisco Cespedes", ritmo: "80sPopBallad", interprete: "Hombre" },
+  { cancion: "Se me Cansó el Corazón", artista: "Margarita la Diosa de la Cumbia", ritmo: null, interprete: null },
+  { cancion: "Se me Olvidó Otra Vez", artista: "Juan Gabriel", ritmo: "Mariachi 2-4Lento", interprete: "Hombre" },
+  { cancion: "Se me Perdió la Cadenita", artista: "La Sonora Dinamita ft. Lucho Pérez", ritmo: null, interprete: null },
+  { cancion: "Se me va la Voz", artista: "Alejandro Fernández", ritmo: "UK SoftRock", interprete: "Hombre" },
+  { cancion: "Sé que te Vas", artista: "Ha-Ash ft. Matisse", ritmo: "12-8PopBallad", interprete: "Dueto" },
+  { cancion: "Secreto de Amor", artista: "Joan Sebastian", ritmo: "PopCha-Cha", interprete: "Hombre" },
+  { cancion: "Send my Love (to Your new Lover)", artista: "Adele", ritmo: "HipHop", interprete: "Mujer" },
+  { cancion: "Señora de las Cuatro Decadas", artista: "Ricardo Arjona", ritmo: "16BeatBallad", interprete: "Hombre" },
+  { cancion: "Señora, Señora, Señora", artista: "Denise De Kalafe", ritmo: null, interprete: null },
+  { cancion: "Señorita", artista: "Shawn Mendes ft. Camila Cabello", ritmo: "Beguine", interprete: "Dueto" },
+  { cancion: "Será", artista: "Sin Bandera", ritmo: "ModernPopBallad", interprete: "Hombre" },
+  { cancion: "Set Fire to the Rain", artista: "Adele", ritmo: "BritRockPop", interprete: "Mujer" },
+  { cancion: "Sex on Fire", artista: "Kings of Leon", ritmo: "CanadianRock", interprete: "Hombre" },
+  { cancion: "Sexo, Pudor y Lágrimas", artista: "Aleks Syntek", ritmo: "90sAussiePop", interprete: "Hombre" },
+  { cancion: "Shake it Off", artista: "Taylor Swift", ritmo: "60s8Beat", interprete: "Mujer" },
+  {
+    cancion: "Shallow (from a Star is Born)",
+    artista: "Lady Gaga ft. Bradley Cooper",
+    ritmo: "Easy8Beat",
+    interprete: "Mujer"
+  },
+  { cancion: "Shape of my Heart", artista: "Backstreet Boys", ritmo: null, interprete: null },
+  { cancion: "Shape of You", artista: "Ed Sheeran", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  {
+    cancion: "She Will be Loved",
+    artista: "Buenavista Social Club ft. Maroon 5",
+    ritmo: "PopLatinBallad",
+    interprete: "Hombre"
+  },
+  { cancion: "She's Always a Woman", artista: "Billy Joel", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "She's the One", artista: "Robbie Williams", ritmo: "UK SoftRock", interprete: "Hombre" },
+  { cancion: "Shut up and Dance", artista: "Walk the Moon", ritmo: "US ClubDance", interprete: "Hombre" },
+  { cancion: "Si Fuera Fácil", artista: "Matisse", ritmo: "60sOrganBallad", interprete: "Dueto" },
+  { cancion: "Si no es Ahora (en Vivo)", artista: "Timbiriche", ritmo: "StandardRock", interprete: "Dueto" },
+  {
+    cancion: "Si no Pueden Quererte",
+    artista: "Natalia Lafourcade ft. Leonardo de Lozanne",
+    ritmo: "RumbaFlamenco",
+    interprete: "Dueto"
+  },
+  { cancion: "Si no te Hubieras Ido", artista: "Marco Antonio Solis", ritmo: "8BeatAdria", interprete: "Hombre" },
+  { cancion: "Si Quieres", artista: "Juan Gabriel", ritmo: "BoleroTrio", interprete: "Hombre" },
+  { cancion: "Si te Vas", artista: "Jesse & Joy", ritmo: "PowerRock", interprete: "Mujer" },
+  { cancion: "Si Tú me Quisieras", artista: "Lu", ritmo: "80sGuitarPop", interprete: "Dueto" },
+  { cancion: "Si Tú me Quisieras", artista: "Mon Laferte", ritmo: "SingalongDanceBand", interprete: "Mujer" },
+  { cancion: "Si Tú no Estás", artista: "Sin Bandera", ritmo: "OrchRockBallad", interprete: "Hombre" },
+  { cancion: "Si Tú Quieres", artista: "Elefante", ritmo: "PopEvergreen", interprete: "Hombre" },
+  { cancion: "Si una Vez", artista: "Selena", ritmo: null, interprete: null },
+  { cancion: "Si veo a tu Mamá", artista: "Bad Bunny", ritmo: "LatinBoyBand", interprete: "Hombre" },
+  { cancion: "Si voy a Perderte", artista: "Gloria Estefan", ritmo: "SmoothPopBallad", interprete: "Mujer" },
+  {
+    cancion: "Siempre en mi Corazón",
+    artista: "Ernesto Lecuona ft. Plácido Domingo",
+    ritmo: "Easy8Beat",
+    interprete: "Instrumental (Jazz)"
+  },
+  { cancion: "Siempre te voy a Querer", artista: "Calibre 50", ritmo: "BaladaBanda 12-8", interprete: "Hombre" },
+  { cancion: "Siento Que", artista: "Jumbo ft. Daniel Gutiérrez", ritmo: "CanadianRock", interprete: "Hombre" },
+  { cancion: "Simplemente Amor", artista: "Ana Victoria ft. Erick Rubin", ritmo: "90sRockBallad", interprete: "Dueto" },
+  { cancion: "Sin Consideración", artista: "Alejandro Fernández", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Sin Ti", artista: "Benny Ibarra", ritmo: "90sUS ChartBallad", interprete: "Hombre" },
+  { cancion: "Sin ti", artista: "Luis Miguel", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Sin ti", artista: "Samo", ritmo: "80sDivaBallad", interprete: "Hombre" },
+  { cancion: "Sin tu Latido", artista: "Luis Eduardo Aute", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Sirena", artista: "Sin Bandera", ritmo: "DiscoChocolate", interprete: "Hombre" },
+  { cancion: "Skyfall", artista: "Adele", ritmo: "SecretService", interprete: "Mujer" },
+  { cancion: "Slipping Through my Fingers", artista: "Abba", ritmo: "CountryFolkBallad", interprete: "Mujer" },
+  { cancion: "Solamente una Vez", artista: "Luis Miguel", ritmo: "OrchBolero", interprete: "Hombre" },
+  { cancion: "Solar Power", artista: "Lorde", ritmo: "Chillout2", interprete: "Mujer" },
+  { cancion: "Solo con Verte", artista: "Banda MS", ritmo: "BaladaBanda 4-4", interprete: "Hombre" },
+  { cancion: "Solo Dame Otra Oportunidad", artista: "Enanitos Verdes", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Solo Para Ti", artista: "Camila", ritmo: "IrishPopRock", interprete: "Hombre" },
+  { cancion: "Sombras", artista: "Javier Solis", ritmo: "BoleroMariachi", interprete: "Hombre" },
+  { cancion: "Somebody That I Used to Know", artista: "Gotye ft. Kimbra", ritmo: "PopBossa", interprete: "Dueto" },
+  { cancion: "Someone Like You", artista: "Adele", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Someone you Loved", artista: "Lewis Capaldi", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Something", artista: "The Beatles", ritmo: "60sOrganBallad", interprete: "Hombre" },
+  {
+    cancion: "Somewhere Over the Rainbow/What a Wonderful World",
+    artista: "Israel Kamakawiwo'ole",
+    ritmo: "Instrumental",
+    interprete: "Hombre"
+  },
+  { cancion: "Somos Novios", artista: "Armando Manzanero", ritmo: "Rumba", interprete: "Hombre" },
+  { cancion: "Sonambulo", artista: "Santo y Johnny Farina", ritmo: "6-8SlowRock", interprete: "Instrumental" },
+  { cancion: "Sonido Coniff", artista: "Grupo Latino", ritmo: "BigBandMedium", interprete: "Instrumental" },
+  { cancion: "Soñé", artista: "Zoé", ritmo: null, interprete: null },
+  { cancion: "Sorry", artista: "Justin Bieber", ritmo: "DanceFloor", interprete: "Hombre" },
+  { cancion: "Soy lo Prohibido", artista: "Alicia Villareal", ritmo: "BoleroMariachi", interprete: "Mujer" },
+  { cancion: "Soy un Desastre", artista: "Timbiriche", ritmo: "80sGuitarPop", interprete: "Dueto" },
+  { cancion: "Spanish Girl", artista: "Amarfis y la Banda de Atakke", ritmo: null, interprete: null },
+  { cancion: "Sshh!!", artista: "Kumbia Kings", ritmo: "KumbiaKings", interprete: "Hombre" },
+  { cancion: "Stand by Me", artista: "Ben E. King", ritmo: null, interprete: null },
+  { cancion: "Starlight", artista: "Muse", ritmo: "BritRockPop", interprete: "Hombre" },
+  { cancion: "Stay", artista: "Rihanna ft. Mikky Ekko", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Stay With Me", artista: "Sam Smith", ritmo: "UK Soul", interprete: "Hombre" },
+  { cancion: "Stayin' Alive", artista: "Bee Gees", ritmo: null, interprete: null },
+  { cancion: "Stitches", artista: "Shawn Mendes", ritmo: null, interprete: null },
+  { cancion: "Stolen Dance", artista: "Milky Chance", ritmo: "MinimalElectro", interprete: "Hombre" },
+  { cancion: "Strangers in the Night", artista: "Standard", ritmo: "70sBeatBallad", interprete: "Instrumental" },
+  { cancion: "Suavecito", artista: "Laura Leon", ritmo: "CumbiaPeru", interprete: "Mujer" },
+  { cancion: "Suelta mi Mano", artista: "Sin Bandera", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Suena el Dembow",
+    artista: "Joey Montana ft. Sebastian Yatra",
+    ritmo: "ReggaetonMedio",
+    interprete: "Hombre"
+  },
+  { cancion: "Sueños rotos", artista: "La Quinta Estacion", ritmo: "OrchRockBallad2", interprete: "Mujer" },
+  { cancion: "Sugar", artista: "Maroon 5", ritmo: "80sGuitarPop", interprete: "Hombre" },
+  { cancion: "Summertime Sadness", artista: "Lana del Rey", ritmo: "USCountryPop", interprete: "Mujer" },
+  { cancion: "Sunday Morning", artista: "Maroon 5", ritmo: "FusionShuffle", interprete: "Hombre" },
+  { cancion: "Supe que me Amabas", artista: "Marcela Gandara", ritmo: "US CountryPop", interprete: "Mujer" },
+  { cancion: "Súper Héroe", artista: "Ale Zeguer", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "Tabaco y Channel", artista: "Bacilos", ritmo: "Beguine", interprete: "Hombre" },
+  { cancion: "Taboo", artista: "Don Omar", ritmo: "ClubReggaeton", interprete: "Hombre" },
+  { cancion: "Tacones Rojos", artista: "Sebastian Yatra", ritmo: null, interprete: null },
+  { cancion: "Take my Breath Away", artista: "Berlin", ritmo: "90s8BeatBallad", interprete: "Mujer" },
+  { cancion: "Take on Me", artista: "A-Ha", ritmo: null, interprete: null },
+  { cancion: "Talento de Television", artista: "Willie Colon", ritmo: "SalsaGranCiclon", interprete: "Hombre" },
+  { cancion: "Talking to the Moon", artista: "Bruno Mars", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Tan Solo Tú",
+    artista: "Franco de Vita ft. Alejandra Guzman",
+    ritmo: "ContempGrtPop",
+    interprete: "Dueto"
+  },
+  { cancion: "Tan solo un Minuto", artista: "Rio Roma", ritmo: "Worship6-8", interprete: "Hombre" },
+  { cancion: "Tanto Amor (Pop)", artista: "Shalia Durcal", ritmo: "80sPopBallad", interprete: "Mujer" },
+  { cancion: "Tatuajes", artista: "Joan Sebastian", ritmo: "BoleroRancheroExp", interprete: "Hombre" },
+  { cancion: "Te Amaré", artista: "Miguel Bose", ritmo: "PopEvergreen", interprete: "Hombre" },
+  { cancion: "Te Amo", artista: "Franco de Vita", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Te Besé", artista: "Leonel Garcia ft. Maria Jose", ritmo: "BritRockPop", interprete: "Dueto" },
+  { cancion: "Te Dejo en Libertad", artista: "Ha-Ash", ritmo: "CountryFolkBallad", interprete: "Mujer" },
+  { cancion: "Te Equivocaste", artista: "Yuridia", ritmo: "OrchRockBallad", interprete: "Mujer" },
+  { cancion: "Te Esperé", artista: "Jesse & Joy", ritmo: "ModernPopBallad", interprete: "Mujer" },
+  { cancion: "Te Extraño", artista: "Armando Manzanero", ritmo: "BoleroLento", interprete: "Hombre" },
+  { cancion: "Te Extraño, te Olvido, te Amo", artista: "Ricky Martin", ritmo: "90sRockBallad", interprete: "Hombre" },
+  { cancion: "Te Hubieras ido Antes", artista: "Julión Alvarez", ritmo: "BaladaBanda 12-8", interprete: "Hombre" },
+  { cancion: "Te Juro Que te Amo", artista: "Los Terricolas", ritmo: "Live8Beat", interprete: "Hombre" },
+  { cancion: "Te Lleno de Caricias", artista: "Edgar Oceransky", ritmo: "70sPopDuo2", interprete: "Hombre" },
+  {
+    cancion: "Te Metiste",
+    artista: "Ariel Camacho (cover Octubre Doce)",
+    ritmo: "Balada Acústica",
+    interprete: "Mujer"
+  },
+  { cancion: "Te Necesito", artista: "Luis Miguel", ritmo: "FusionShuffle", interprete: "Hombre" },
+  { cancion: "Te Presumo (Balada)", artista: "Banda el Recodo", ritmo: "BaladaBanda 12-8", interprete: "Hombre" },
+  { cancion: "Te Propongo", artista: "Los Claxons", ritmo: null, interprete: null },
+  { cancion: "Te Quiero", artista: "Hombres G", ritmo: "6-8SlowRock", interprete: "Hombre" },
+  { cancion: "Te Quiero Para Mí", artista: "Trigo Limpio", ritmo: "Classic8Beat", interprete: "Hombre" },
+  { cancion: "Te Quiero Tanto, Tanto", artista: "OV7", ritmo: "ContempGrtPop", interprete: "Dueto" },
+  { cancion: "Te Quise Olvidar", artista: "MDO", ritmo: "ContempGrtPop", interprete: "Hombre" },
+  { cancion: "Te Robaré", artista: "Prince Royce", ritmo: "Bachata", interprete: "Hombre" },
+  { cancion: "Te Sigo Amando", artista: "Rocío Dúrcal", ritmo: "MarciahiWaltz", interprete: "Mujer" },
+  { cancion: "Te vi Venir", artista: "Sin Bandera", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Te voy a Amar", artista: "Axel", ritmo: "CountryBallad1", interprete: "Hombre" },
+  { cancion: "Tears in Heaven", artista: "Eric Clapton", ritmo: "UnpluggedBallad", interprete: "Hombre" },
+  { cancion: "Teenage Dream", artista: "Katy Perry", ritmo: "Slow'n'Swingin'", interprete: "Mujer" },
+  { cancion: "Telepatía", artista: "Kali Ushis", ritmo: "CoolR&B", interprete: "Mujer" },
+  { cancion: "Terrenal ", artista: "Julion Alvarez", ritmo: "BaladaBanda2", interprete: "Hombre" },
+  { cancion: "Thank U, Next", artista: "Ariana Grande", ritmo: null, interprete: "Mujer" },
+  { cancion: "Thank You", artista: "Dido", ritmo: null, interprete: "Mujer" },
+  { cancion: "Thank you for Loving Me", artista: "Bon Jovi", ritmo: null, interprete: "Hombre" },
+  { cancion: "That's What I Like", artista: "Bruno Mars", ritmo: null, interprete: "Hombre" },
+  { cancion: "The Ballad of John and Yoko", artista: "The Beatles", ritmo: null, interprete: null },
+  {
+    cancion: "The Girl From Ipanema",
+    artista: "Frank Sinatra ft. Antonio Carlos Jobim (Standard)",
+    ritmo: "BossaNova",
+    interprete: "Hombre"
+  },
+  { cancion: "The Only Exception", artista: "Paramore", ritmo: null, interprete: "Mujer" },
+  { cancion: "The Poet and I", artista: "Frank Mills", ritmo: null, interprete: "Instrumental" },
+  { cancion: "The Power of Love", artista: "Celine Dion", ritmo: null, interprete: "Mujer" },
+  { cancion: "The Prayer", artista: "Celine Dione ft. Andrea Bocelli", ritmo: null, interprete: "Dueto" },
+  { cancion: "The Reason", artista: "Hoobastank", ritmo: null, interprete: "Hombre" },
+  { cancion: "The Scientist", artista: "Coldplay", ritmo: null, interprete: "Hombre" },
+  { cancion: "The Shadow of Your Smile", artista: "Standard", ritmo: null, interprete: "Instrumental (Jazz)" },
+  { cancion: "The Story", artista: "Brandi Carlile", ritmo: null, interprete: "Mujer" },
+  { cancion: "There's Nothing Holdin' me Back", artista: "Shawn Mendes", ritmo: null, interprete: "Hombre" },
+  { cancion: "Thinking Out Loud", artista: "Ed Sheeran", ritmo: null, interprete: "Hombre" },
+  { cancion: "This is What You Came For", artista: "Calvin Harris ft. Rihanna", ritmo: null, interprete: null },
+  { cancion: "This Love", artista: "Maroon 5", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tico Tico", artista: "Standard", ritmo: null, interprete: "Instrumental" },
+  {
+    cancion: "Tiene Espinas el Rosal/Boulevard/Me Voy a Ir",
+    artista: "Cañaveral ft. Jenny and the Mexicats",
+    ritmo: null,
+    interprete: null
+  },
+  { cancion: "Till Kingdom Come", artista: "Coldplay", ritmo: null, interprete: "Hombre" },
+  { cancion: "Titanium", artista: "David Guetta ft. Sia", ritmo: null, interprete: "Mujer" },
+  { cancion: "To be Loved", artista: "Adele", ritmo: null, interprete: null },
+  { cancion: "Todavia", artista: "Matisse", ritmo: null, interprete: "Dueto" },
+  { cancion: "Todo Cambió", artista: "Camila", ritmo: null, interprete: "Hombre" },
+  { cancion: "Todo de Ti", artista: "Rauw Alejandro", ritmo: null, interprete: "Hombre" },
+  { cancion: "Todo lo que Eres", artista: "Ray Conniff", ritmo: null, interprete: null },
+  { cancion: "Todo Pasará", artista: "Nelson Ned", ritmo: null, interprete: "Hombre" },
+  { cancion: "Todos me Miran", artista: "Gloria Trevi", ritmo: null, interprete: "Mujer" },
+  { cancion: "Toma Mi Mano", artista: "Belanova", ritmo: null, interprete: "Mujer" },
+  { cancion: "Too Good at Goodbyes", artista: "Sam Smith", ritmo: null, interprete: "Hombre" },
+  { cancion: "Total Eclipse of the Heart", artista: "Bonnie Tyler", ritmo: null, interprete: "Dueto" },
+  { cancion: "Tragos Amargos", artista: "Pesado", ritmo: null, interprete: "Hombre" },
+  { cancion: "Traicionera", artista: "Sebastian Yatra", ritmo: null, interprete: "Hombre" },
+  { cancion: "Traicionero", artista: "Margarita la Diosa de la Cumbia", ritmo: null, interprete: null },
+  { cancion: "Tren al Sur", artista: "Moenia", ritmo: null, interprete: null },
+  { cancion: "Tributo a Roberto Carlos", artista: "Yahir", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tú", artista: "Noelia", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tú", artista: "Reily", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tú", artista: "Shakira", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tu Cárcel", artista: "Los Bukis", ritmo: null, interprete: null },
+  { cancion: "Tú de Que Vas", artista: "Franco de Vita", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tu Falta de Querer", artista: "Mon Laferte", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tú me Caiste del Cielo", artista: "Rio Roma", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tú me Vuelves Loco", artista: "Marco Antonio Solis", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tu Peor Error", artista: "La Quinta Estacion", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tú si Sabes Quererme", artista: "Natalia Lafourcade", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tú Sin Mi", artista: "Dread Mar", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tu Voz", artista: "Guadalupe Pineda", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tú y yo Somos uno Mismo", artista: "Timbiriche", ritmo: null, interprete: null },
+  { cancion: "Turning Page", artista: "Sleeping At Last", ritmo: null, interprete: null },
+  { cancion: "Tus Ojos", artista: "David Cavazos", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tus Ojos", artista: "Locos del Ritmo", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tus Ojos Castaños", artista: "Nelson Ned", ritmo: null, interprete: "Hombre" },
+  { cancion: "Tusa", artista: "Karol G. ft. Nicki Minaj", ritmo: null, interprete: "Mujer" },
+  { cancion: "Tutu", artista: "Camilo ft. Pedro Capó", ritmo: null, interprete: "Hombre" },
+  { cancion: "Umbrella", artista: "Rihanna ft. Jay-Z", ritmo: null, interprete: null },
+  { cancion: "Un Año", artista: "Sebastian Yatra ft. Reik", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Beso Grande", artista: "Edgar Oceransky", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Buen Perdedor", artista: "Franco de Vita", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Día a la Vez", artista: "Los Tigres del Norte", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Grito en la Noche", artista: "Alejandra Guzmán ft. Moderatto", ritmo: null, interprete: "Dueto" },
+  { cancion: "Un Hombre Normal", artista: "Espinoza Paz", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Minuto Nada Más", artista: "Hombres G", ritmo: null, interprete: "Hombre" },
+  { cancion: "Un Nuevo Amor", artista: "Maria Jose", ritmo: null, interprete: "Mujer" },
+  { cancion: "Un Nuevo Amor", artista: "Tranzas", ritmo: "SmoothPopBallad", interprete: "Hombre" },
+  { cancion: "Un Puño de Tierra", artista: "Las Fenix", ritmo: null, interprete: "Mujer" },
+  {
+    cancion: "Un Rinconcito en el Cielo/Que me Lleve el Diablo",
+    artista: "Ramón Ayala",
+    ritmo: null,
+    interprete: "Hombre"
+  },
+  { cancion: "Un Viejo Amor", artista: "Los Babys ft. Edith Marquez", ritmo: null, interprete: "Dueto" },
+  { cancion: "Una Aventura", artista: "Los Rieleros del Norte", ritmo: null, interprete: null },
+  { cancion: "Una Página Más", artista: "Pesado", ritmo: null, interprete: "Hombre" },
+  { cancion: "Unchained Melody", artista: "Righteous brothers", ritmo: null, interprete: "Hombre" },
+  { cancion: "Underneath your Clothes", artista: "Shakira", ritmo: null, interprete: "Mujer" },
+  { cancion: "Uno", artista: "Benny Ibarra", ritmo: null, interprete: "Hombre" },
+  { cancion: "Urge (Primera Fila)", artista: "Vicente Fernandez", ritmo: null, interprete: "Hombre" },
+  { cancion: "Use Somebody", artista: "Kings of Leon", ritmo: null, interprete: "Hombre" },
+  { cancion: "Usted", artista: "Luis Miguel", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vals - Danubio Azul", artista: "Herbert von Karajan", ritmo: null, interprete: "Instrumental (Vals)" },
+  { cancion: "Vals - Vienna Life", artista: null, ritmo: null, interprete: null },
+  { cancion: "Vals del Amor", artista: "Joan Sebastian", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vals Fascinación", artista: null, ritmo: null, interprete: null },
+  { cancion: "Vals Lara's Theme", artista: "Paul Mauriat", ritmo: null, interprete: "Instrumental (Vals)" },
+  {
+    cancion: "Vals Recuerdo",
+    artista: "Javier Solís (Alberto M. Alvarado)",
+    ritmo: null,
+    interprete: "Instrumental (Vals)"
+  },
+  { cancion: "Vamos a Darnos Tiempo", artista: "José José", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vanidosa", artista: "Banda Cuisillos", ritmo: null, interprete: "Hombre" },
+  { cancion: "Ven a mi Casa Esta Navidad", artista: "Luis Aguile", ritmo: null, interprete: "Hombre" },
+  { cancion: "Veneno Vil", artista: "Fobia", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vente pa' Ca", artista: "Ricky Martin ft. Maluma", ritmo: null, interprete: "Hombre" },
+  { cancion: "Venus", artista: "Santo y Johnny Farina", ritmo: null, interprete: "Instrumental" },
+  {
+    cancion: "Veo en ti la Luz (Enredados)",
+    artista: "Chayanne ft. Danna Paola",
+    ritmo: "Balada Acústica",
+    interprete: "Dueto"
+  },
+  { cancion: "Verano ", artista: "La Oreja de Van Gogh", ritmo: null, interprete: "Mujer" },
+  { cancion: "Verde más Allá", artista: "Jenny and the Mexicats", ritmo: null, interprete: "Mujer" },
+  { cancion: "Ves", artista: "Sin Bandera", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "Vestido Rojo", artista: "Acapulco Tropical", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vía Láctea", artista: "Zoé", ritmo: null, interprete: "Hombre" },
+  { cancion: "Viene y Va", artista: "Matisse", ritmo: null, interprete: "Mujer" },
+  { cancion: "Viva la Vida", artista: "Coldplay", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vive (en Vivo)", artista: "José María Napoleón", ritmo: null, interprete: "Hombre" },
+  { cancion: "Viviendo de Noche", artista: "Veni Vidi Vici", ritmo: null, interprete: null },
+  {
+    cancion: "Vivir mi Vida/La Vida es un Carnaval",
+    artista: "Marc Anthony/Celia Cruz",
+    ritmo: null,
+    interprete: "Dueto"
+  },
+  { cancion: "Vivir sin Aire (Unplugged)", artista: "Maná", ritmo: null, interprete: "Hombre" },
+  {
+    cancion: "Vivo por Ella (Vivo Per Lei)",
+    artista: "Andrea Bocelli ft. Marta Sánchez",
+    ritmo: null,
+    interprete: "Dueto"
+  },
+  { cancion: "Volaré (Azul Pintado de Azul)", artista: "Domenico Modugno", ritmo: null, interprete: "Hombre" },
+  { cancion: "Volver, Volver", artista: "Vicente Fernandez", ritmo: null, interprete: "Hombre" },
+  { cancion: "Volví a Nacer", artista: "Carlos Vives", ritmo: null, interprete: "Hombre" },
+  { cancion: "Voulez-Vous", artista: "Abba", ritmo: null, interprete: null },
+  { cancion: "Voy a Apagar la Luz/Contigo Aprendí", artista: "Luis Miguel", ritmo: null, interprete: "Hombre" },
+  { cancion: "Voy a Llorar por Ti", artista: "Los Rieleros del Norte", ritmo: null, interprete: null },
+  { cancion: "Voy a Olvidarte", artista: "Reik", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vuelve", artista: "Ricky Martin", ritmo: null, interprete: "Hombre" },
+  { cancion: "Vuelvo a Sentir", artista: "Varana", ritmo: null, interprete: "Hombre" },
+  { cancion: "Wannabe", artista: "Spice Girls", ritmo: null, interprete: "Mujer" },
+  { cancion: "Watermelon Sugar", artista: "Harry Styles", ritmo: null, interprete: null },
+  {
+    cancion: "We are Never Ever Getting Back Together",
+    artista: "Taylor Swift",
+    ritmo: "UK SoftRock",
+    interprete: "Mujer"
+  },
+  { cancion: "We Belong Together", artista: "Los Lobos", ritmo: null, interprete: "Hombre" },
+  { cancion: "We Don't Talk Anymore", artista: "Chalie Puth ft. Selena Gomez", ritmo: null, interprete: "Dueto" },
+  { cancion: "We're Good", artista: "Dua Lipa", ritmo: null, interprete: "Mujer" },
+  { cancion: "What's Up", artista: "4 Non Blonde", ritmo: null, interprete: "Mujer" },
+  { cancion: "When I was Your Man", artista: "Bruno Mars", ritmo: "Balada Acústica", interprete: "Hombre" },
+  { cancion: "When we Were Young", artista: "Adele", ritmo: "Balada Acústica", interprete: "Mujer" },
+  { cancion: "When You're Gone", artista: "The Cranberries", ritmo: null, interprete: null },
+  { cancion: "Wherever you will Go", artista: "The Calling", ritmo: null, interprete: "Hombre" },
+  { cancion: "White Flag", artista: "Dido", ritmo: null, interprete: "Mujer" },
+  { cancion: "Wind of Change", artista: "Scorpions", ritmo: null, interprete: "Hombre" },
+  { cancion: "Wish you Were Gay", artista: "Billie Eilish", ritmo: null, interprete: "Mujer" },
+  { cancion: "Woman", artista: "John Lennon", ritmo: null, interprete: null },
+  { cancion: "Writing's on the Wall", artista: "Sam Smith", ritmo: "Balada Acústica", interprete: "Hombre" },
+  {
+    cancion: "Y Ahora te Vas (en vivo Argentina 2011)",
+    artista: "Marco Antonio Solis",
+    ritmo: null,
+    interprete: "Hombre"
+  },
+  { cancion: "Y Como es Él", artista: "José Luis Perales", ritmo: null, interprete: "Hombre" },
+  { cancion: "Y Como Quieres que te Quiera", artista: "Banda MM", ritmo: "Quebradita", interprete: "Hombre" },
+  { cancion: "Y nos Dieron las Diez", artista: "Joaquin Sabina", ritmo: null, interprete: "Hombre" },
+  { cancion: "Ya es muy Tarde", artista: "Yuridia", ritmo: null, interprete: "Mujer" },
+  { cancion: "Ya lo Sé", artista: "Jenni Rivera", ritmo: null, interprete: "Mujer" },
+  { cancion: "Ya lo Veia Venir", artista: "Moderatto", ritmo: null, interprete: "Hombre" },
+  { cancion: "Ya me Enteré", artista: "Reik", ritmo: null, interprete: "Hombre" },
+  { cancion: "Ya no Quiero", artista: "Jesse & Joy", ritmo: null, interprete: "Mujer" },
+  { cancion: "Ya no sé Vivir sin Ti", artista: "Madison ft. Melissa", ritmo: "Balada Acústica", interprete: "Dueto" },
+  { cancion: "Ya te Olvidé", artista: "Yuridia", ritmo: null, interprete: "Mujer" },
+  { cancion: "Yegua (en vivo)", artista: "Babasonicos", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yellow", artista: "Coldplay", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yesterday", artista: "The Beatles", ritmo: null, interprete: "Hombre" },
+  { cancion: "YMCA", artista: "Village People", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yo no Fui", artista: "Pedro Fernandez", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yo no se Mañana", artista: "Luis Enrique", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yo Por Él", artista: "Yuridia", ritmo: null, interprete: "Mujer" },
+  { cancion: "Yo Primero la Amé", artista: "Gilberto Gless", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yo Quisiera", artista: "Reik", ritmo: null, interprete: "Hombre" },
+  { cancion: "Yo sé que no es Feliz", artista: "Leo Dan ft. Matisse", ritmo: null, interprete: "Dueto" },
+  { cancion: "Yo te Amo", artista: "Chayanne", ritmo: null, interprete: null },
+  { cancion: "Yo te Extrañaré", artista: "Tercer Cielo", ritmo: null, interprete: "Dueto" },
+  { cancion: "Yolanda (Te Amo)", artista: "Guadalupe Pineda", ritmo: null, interprete: "Mujer" },
+  { cancion: "You Belong With Me", artista: "Taylor Swift", ritmo: "NashvillePop", interprete: "Mujer" },
+  { cancion: "You Know I'm no Good ", artista: "Amy Winehouse", ritmo: null, interprete: "Mujer" },
+  {
+    cancion: "You'll Never Find Another Love Like Mine",
+    artista: "Michael Buble ft. Laura Pausini",
+    ritmo: null,
+    interprete: "Dueto"
+  },
+  { cancion: "You're Beatiful ", artista: "James Blunt", ritmo: null, interprete: "Hombre" },
+  { cancion: "You're Still the One", artista: "Shania Twain", ritmo: null, interprete: "Mujer" },
+  { cancion: "You've Got a Way", artista: "Shania Twain", ritmo: null, interprete: "Mujer" },
+  {
+    cancion: "Yuri Medley (Primera Fila) (Que te Pasa, El Apagón, Hombres al Borde de un Ataque)",
+    artista: "Yuri",
+    ritmo: null,
+    interprete: null
+  },
+  { cancion: "Zombie", artista: "The Cranberries", ritmo: "UK SoftRock", interprete: "Mujer" },
+  { cancion: "Zopilote Mojado", artista: null, ritmo: "Paso-Doble", interprete: "Instrumental (Polca)" }
+];  </script>
+  <script>
+    // 1. ELEMENTOS
+    const buscador         = document.getElementById('buscador');
+    const cuerpo           = document.getElementById('cuerpo');
+    const filtroRitmo      = document.getElementById('filtroRitmo');        // corregido: filtrarRitmo → filtroRitmo
+    const filtroInterprete = document.getElementById('filtroInterprete');
+    const btnAgregar       = document.getElementById('btnAgregar');
+    const formulario       = document.getElementById('formulario');
+    const btnGuardar       = document.getElementById('btnGuardar');
+    const btnCancelar      = document.getElementById('btnCancelar');
+    const modal            = document.getElementById('modal');
+    const btnGuardarEdicion = document.getElementById('btnGuardarEdicion');
+    const btnEliminar      = document.getElementById('btnEliminar');
+    const btnCerrarModal   = document.getElementById('btnCerrarModal');
+    const btnExportar      = document.getElementById('btnExportar');
+    const btnImportar      = document.getElementById('btnImportar');
+    const inputImportar    = document.getElementById('inputImportar');
 
-            <div class="features-grid">
-                <div class="feature-item">
-                    <img src="images/editText.png" alt="Edit Text">
-                </div>
-                <div class="feature-item">
-                    <img src="images/imageLib.svg" alt="Image Library">
-                </div>
-                <div class="feature-item">
-                    <img src="images/drahNDrop.png" alt="Drag and Drop">
-                </div>
-                <div class="feature-item">
-                    <img src="images/layoutRulers.png" alt="Layout Rulers">
-                </div>
-            </div>
+    // 2. DATOS
+    function cargarDatos() {
+      try {
+        const guardado = localStorage.getItem('repertorio');
+        if (guardado) {
+          return JSON.parse(guardado);
+        }
+      } catch(e) {}
+      return canciones.slice(); // copia del array original
+    }
 
-            <div class="get-started-container phcode-no-lp-edit phcode-dismiss-lp-edit">
-                <button class="get-started-button" id="get-started-button">
-                    <span>Empezar</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
+    function guardarDatos() {
+      try {
+        localStorage.setItem('repertorio', JSON.stringify(lista));
+      } catch(e) {}
+    }
 
-        <!-- Section 2: Live Preview Edit -->
-        <div class="paper-card section phcode-no-lp-edit-this" id="section-2" data-section="2">
-            <div class="section-header phcode-no-lp-edit">
-                <h2 class="section-title">Editar Texto</h2>
-                <p class="section-subtitle">Haz doble clic para editar el texto de abajo y agregar tu nombre</p>
-            </div>
+    let lista = cargarDatos();
+    let indiceEditando = null;
 
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="editable-container">
-                    <span id="editable-name" class="editable-text">Hola ___</span>
-                </div>
-            </div>
+    // 3. SELECTORES
+    function llenarSelector(selector, campo) {
+      const etiqueta = campo === 'ritmo' ? 'Ritmo' : 'Intérprete';
+      selector.innerHTML = '<option value="">' + etiqueta + ' (todos)</option>';
+      const valores = [];
+      lista.forEach(function(item) {
+        if (item[campo] && !valores.includes(item[campo])) {
+          valores.push(item[campo]);
+        }
+      });
+      valores.sort(function(a, b) {
+        return a.localeCompare(b, 'es');
+      });
+      valores.forEach(function(valor) {
+        const opcion = document.createElement('option');
+        opcion.value = valor;
+        opcion.textContent = valor;
+        selector.appendChild(opcion);
+      });
+    }
 
-            <div class="success-message phcode-no-lp-edit" id="success-message">
-                <span class="success-icon">←</span>
-                <p id="success-message-text">Tu edición actualizó el código — deshaz con <span id="undo-shortcut"></span>, rehaz con <span id="redo-shortcut"></span>.</p>
-            </div>
+    function actualizarSelectores() {
+      llenarSelector(filtroRitmo,      'ritmo');
+      llenarSelector(filtroInterprete, 'interprete');
+    }
 
-            <div class="slide-controls phcode-no-lp-edit"></div>
+    // 4. TABLA
+    function dibujarTabla(datos) {
+      cuerpo.innerHTML = '';
+      datos.forEach(function(item) {
+        const indice = lista.indexOf(item);
+        const fila = document.createElement('tr');
+        fila.innerHTML =
+          '<td>' + (item.cancion    || '') + '</td>' +
+          '<td>' + (item.artista    || '') + '</td>' +
+          '<td>' + (item.ritmo      || '') + '</td>' +
+          '<td>' + (item.interprete || '') + '</td>' +
+          '<td><button class="btn-editar" data-indice="' + indice + '">✎</button></td>';
+        cuerpo.appendChild(fila);
+      });
+      // corregido: 'btn-editar' → '.btn-editar'
+      document.querySelectorAll('.btn-editar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const indice = parseInt(btn.dataset.indice);   // corregido: cont → const
+          abrirModal(indice);
+        });
+      });
+      // Actualizar contador
+      document.getElementById('totalCanciones').textContent = lista.length;
+    }
 
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="2">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Para completar esta tarea:</p>
-                <ol>
-                    <li>Haz doble clic en el texto &quot;Hola ___&quot;</li>
-                    <li>Reemplaza los guiones bajos con tu nombre</li>
-                    <li>Pulsa Intro o haz clic fuera para aplicar los cambios</li>
-                </ol>
-            </div>
-        </div>
+    // 5. FILTRAR
+    function sinAcentos(str) {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
 
-        <!-- Section 3: Change Images Live -->
-        <div class="paper-card section phcode-no-lp-edit-this" id="section-3" data-section="3">
-            <div class="section-header phcode-no-lp-edit">
-                <h2 class="section-title">Cambia imágenes en tiempo real</h2>
-                <p class="section-subtitle">Haz clic en la imagen de abajo para reemplazarla por una que te guste de la biblioteca de imágenes.</p>
-            </div>
+    function filtrar() {
+      const texto      = sinAcentos(buscador.value.toLowerCase());
+      const ritmo      = filtroRitmo.value;
+      const interprete = filtroInterprete.value;
 
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="image-container phcode-no-lp-edit-this">
-                    <img id="replaceable-image" src="images/placeholder.svg" alt="Replaceable image" class="replaceable-image">
-                </div>
-            </div>
+      const resultado = lista.filter(function(item) {
+        const contenido = sinAcentos(
+          (item.cancion    || '') + ' ' +
+          (item.artista    || '') + ' ' +
+          (item.ritmo      || '') + ' ' +
+          (item.interprete || '')
+        ).toLowerCase();
+        const pasaTexto      = contenido.includes(texto);
+        const pasaRitmo      = (ritmo      === '') || (item.ritmo      === ritmo);
+        const pasaInterprete = (interprete === '') || (item.interprete === interprete);
+        return pasaTexto && pasaRitmo && pasaInterprete;
+      });
+      dibujarTabla(resultado);
+    }
 
-            <div class="success-message phcode-no-lp-edit" id="success-message-section3">
-                <p id="success-message-text-section3-url" style="display: none;">¿Sabías que puedes descargar imágenes con el botón de descarga <img src="images/download.svg" alt="Download" class="inline-icon"> en la biblioteca de imágenes?</p>
-                <p id="success-message-text-section3-local" style="display: none;">¿Sabías que puedes hacer clic en una imagen para usarla sin descargarla?</p>
-            </div>
+    // 6. FORMULARIO — agregar
+    btnAgregar.addEventListener('click', function() {
+      formulario.style.display = 'block';
+    });
 
-            <div class="slide-controls phcode-no-lp-edit"></div>
+    btnCancelar.addEventListener('click', function() {
+      formulario.style.display = 'none';
+      limpiarFormulario();
+    });
 
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="3">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Para completar esta tarea:</p>
-                <ul>
-                    <li>Haz clic en la imagen para abrir la Biblioteca de imágenes (alterna con el icono <img src="images/image.svg" alt="Image" class="inline-icon"> de la barra de herramientas o haz doble clic).</li>
-                    <li>En la biblioteca de imágenes: pasa el cursor sobre las miniaturas para previsualizarlas</li>
-                    <li>Haz clic en una miniatura para colocarla en tu página, o haz clic en el icono <img src="images/download.svg" alt="Download" class="inline-icon"> para descargarla primero</li>
-                </ul>
-            </div>
-        </div>
+    function limpiarFormulario() {
+      document.getElementById('nuevaCancion').value    = '';
+      document.getElementById('nuevoArtista').value    = '';
+      document.getElementById('nuevoRitmo').value      = '';
+      document.getElementById('nuevoInterprete').value = '';
+    }
 
-        <!-- Section 4: Edit Elements Visually -->
-        <div class="paper-card section phcode-no-lp-edit-this" id="section-4" data-section="4">
-            <div class="section-header phcode-no-lp-edit">
-                <h2 class="section-title">Edita elementos visualmente</h2>
-                <p class="section-subtitle">Duplica<img src="images/duplicate.svg" alt="Duplicate" class="inline-icon"> la tarjeta de abajo para tener un total de <strong>3 tarjetas</strong>, luego <strong>elimina<img src="images/trash.svg" alt="Delete" class="inline-icon"> 1 tarjeta</strong>.</p>
-            </div>
+    btnGuardar.addEventListener('click', function() {
+      const cancion = document.getElementById('nuevaCancion').value.trim();
+      if (cancion === '') {
+        alert('El nombre de la canción no puede estar vacío.');
+        return;
+      }
+      lista.push({
+        cancion:    cancion,
+        artista:    document.getElementById('nuevoArtista').value.trim()    || null,
+        ritmo:      document.getElementById('nuevoRitmo').value.trim()      || null,
+        interprete: document.getElementById('nuevoInterprete').value.trim() || null,
+      });
+      guardarDatos();
+      // Ordenar alfabéticamente por canción
+      lista.sort(function(a, b) {
+        return (a.cancion || '').localeCompare(b.cancion || '', 'es');
+      });
+      guardarDatos();
+      actualizarSelectores();
+      // Limpiar filtros para que la canción nueva sea visible
+      buscador.value = '';
+      filtroRitmo.value = '';
+      filtroInterprete.value = '';
+      dibujarTabla(lista);
+      formulario.style.display = 'none';
+      limpiarFormulario();
+    });
 
-            <div class="progress-toast phcode-no-lp-edit" id="progress-toast-section4">
-                <p id="progress-toast-text-section4">
-                    <span id="card-count-status">1/3 cards</span>,
-                    <span id="delete-count-status">0/1 deleted</span>
-                </p>
-            </div>
+    // 7. MODAL — editar y eliminar
+    function abrirModal(indice) {
+      indiceEditando = indice;
+      const item = lista[indice];
+      document.getElementById('editCancion').value    = item.cancion    || '';
+      document.getElementById('editArtista').value    = item.artista    || '';   // corregido: editarArtista → editArtista
+      document.getElementById('editRitmo').value      = item.ritmo      || '';
+      document.getElementById('editInterprete').value = item.interprete || '';
+      modal.style.display = 'flex';
+    }
 
-            <div class="undo-message phcode-no-lp-edit" id="undo-message-section4">
-                <span class="warning-icon">⚠️</span>
-                <p>¡Uy! Se han eliminado todas las tarjetas. Pulsa <strong><span id="undo-shortcut-section4"></span></strong> para deshacer.</p>
-            </div>
+    function cerrarModal() {
+      modal.style.display = 'none';
+      indiceEditando = null;
+    }
 
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="cards-container phcode-no-lp-edit-this">
-                    <div class="demo-card">
-                        <img src="images/placeholder.svg" alt="Imagen de la tarjeta" class="card-image">
-                        <h3 class="card-title">Tarjeta</h3>
-                        <p class="card-text">Haz clic en el icono <img src="images/arrowUp.svg" alt="Up" class="inline-icon">&nbsp;de la barra de herramientas superior para seleccionar la tarjeta principal.</p>
-                    </div>
-                </div>
-            </div>
+    btnCerrarModal.addEventListener('click', cerrarModal);
 
-            <div class="success-message phcode-no-lp-edit" id="success-message-section4">
-                <span class="success-icon">✓</span>
-                <p id="success-message-text-section4">¡Perfecto! Has dominado la duplicación y eliminación de elementos.</p>
-            </div>
+    btnGuardarEdicion.addEventListener('click', function() {
+      const cancion = document.getElementById('editCancion').value.trim();
+      if (cancion === '') {
+        alert('El nombre de la canción no puede estar vacío.');
+        return;
+      }
+      lista[indiceEditando] = {                                         // corregido: inidiceEditando → indiceEditando
+        cancion:    cancion,
+        artista:    document.getElementById('editArtista').value.trim()    || null,
+        ritmo:      document.getElementById('editRitmo').value.trim()      || null,
+        interprete: document.getElementById('editInterprete').value.trim() || null,
+      };
+      guardarDatos();
+      actualizarSelectores();
+      filtrar();
+      cerrarModal();
+    });
 
-            <div class="slide-controls phcode-no-lp-edit"></div>
+    btnEliminar.addEventListener('click', function() {
+      const item = lista[indiceEditando];
+      if (confirm('¿Eliminar "' + item.cancion + '"?')) {
+        lista.splice(indiceEditando, 1);
+        guardarDatos();
+        actualizarSelectores();
+        filtrar();
+        cerrarModal();
+      }
+    });
 
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="4">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Para completar esta tarea:</p>
-                <ol style="margin: 0 0 0 20px; padding: 0;">
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Haz clic en la tarjeta para seleccionarla</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Usa el botón <img src="images/duplicate.svg" alt="Duplicate" class="inline-icon"> o pulsa <strong><span id="duplicate-shortcut"></span></strong> para duplicar tarjetas hasta que tengas 3 en total</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Selecciona cualquier tarjeta y usa el botón <img src="images/trash.svg" alt="Delete" class="inline-icon"> o pulsa <strong>Eliminar</strong> para eliminarla</li>
-                    <li style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">Consejo: Puedes deshacer con <strong><span id="undo-shortcut-hint"></span></strong> y rehacer con <strong><span id="redo-shortcut-hint"></span></strong></li>
-                </ol>
-            </div>
-        </div>
+    // Cerrar modal tocando fuera
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {    // corregido: e.targeet → e.target
+        cerrarModal();
+      }
+    });
 
-        <!-- Section 5: Reorder Elements -->
-        <div class="paper-card section phcode-no-lp-edit-this" id="section-5" data-section="5">
-            <div class="section-header phcode-no-lp-edit">
-                <h2 class="section-title">Reordenar elementos arrastrando</h2>
-                <p class="section-subtitle">Arrastra cualquier nota para cambiar el orden.</p>
-            </div>
+    // 8. EXPORTAR JSON
+    btnExportar.addEventListener('click', function() {
+      const texto = JSON.stringify(lista, null, 2);
+      const blob  = new Blob([texto], { type: 'application/json' });
+      const a     = document.createElement('a');
+      a.href      = URL.createObjectURL(blob);
+      a.download  = 'repertorio.json';
+      a.click();
+    });
 
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="notes-container phcode-no-lp-edit-this">
-                    <div class="sticky-note">Segundo lugar</div>
-                    <div class="sticky-note">Primer lugar</div>
-                    <div class="sticky-note">Tercer lugar</div>
-                </div>
-            </div>
+    // 9. IMPORTAR JSON
+    btnImportar.addEventListener('click', function() {
+      inputImportar.click();
+    });
 
-            <div class="success-message phcode-no-lp-edit" id="success-message-section5">
-                <span class="success-icon">✓</span>
-                <p id="success-message-text-section5">Puedes arrastrar elementos a cualquier parte de la página para reorganizarlos.</p>
-            </div>
+    inputImportar.addEventListener('change', function() {
+      const archivo = inputImportar.files[0];
+      if (!archivo) return;
+      const lector = new FileReader();
+      lector.onload = function(e) {
+        try {
+          const importado = JSON.parse(e.target.result);
+          if (!Array.isArray(importado)) {
+            alert('El archivo no tiene el formato correcto.');
+            return;
+          }
+          if (confirm('Se importarán ' + importado.length + ' canciones. ¿Reemplazar la lista actual?')) {
+            lista = importado;
+            guardarDatos();
+            actualizarSelectores();
+            filtrar();
+          }
+        } catch (error) {
+          alert('Error al leer el archivo. Asegúrate de que sea un JSON válido.');
+        }
+        inputImportar.value = '';
+      };
+      lector.readAsText(archivo);    // corregido: readText → readAsText
+    });
 
-            <div class="slide-controls phcode-no-lp-edit"></div>
+    // 10. DESCARGAR HTML ACTUALIZADO
+    document.getElementById('btnDescargarHTML').addEventListener('click', function() {
 
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="5">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Para completar esta tarea:</p>
-                <ol style="margin: 0 0 0 20px; padding: 0;">
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Haz clic y mantén pulsada cualquier nota para empezar a arrastrar.</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Muévela hacia arriba o hacia abajo para cambiar el orden.</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Suelta para colocarla en la nueva posición.</li>
-                </ol>
-            </div>
-        </div>
+      // Construir bloque de datos con la lista actual
+      const lineas = ['const canciones = ['];
+      lista.forEach(function(item) {
+        const cancion    = item.cancion    ? JSON.stringify(item.cancion)    : 'null';
+        const artista    = item.artista    ? JSON.stringify(item.artista)    : 'null';
+        const ritmo      = item.ritmo      ? JSON.stringify(item.ritmo)      : 'null';
+        const interprete = item.interprete ? JSON.stringify(item.interprete) : 'null';
+        lineas.push(
+          '  { cancion: '   + cancion    +
+          ', artista: '     + artista    +
+          ', ritmo: '       + ritmo      +
+          ', interprete: '  + interprete + ' },'
+        );
+      });
+      lineas.push('];');
+      const datosActualizados = lineas.join('\n');
 
-        <!-- Section 6: Edit Links & Preview Mode (Final Slide) -->
-        <div class="paper-card section phcode-no-lp-edit-this" id="section-6" data-section="6">
-            <div class="section-header phcode-no-lp-edit">
-                <h2 class="section-title">Edita los enlaces y previsualiza tu página.</h2>
-                <p class="section-subtitle">Selecciona el icono <img src="images/link.svg" alt="Link" class="inline-icon"> en la barra de herramientas para cambiar a dónde apunta este enlace.</p>
-            </div>
+      // Tomar el HTML completo de la página actual y reemplazar el bloque de datos
+      const paginaCompleta = document.documentElement.outerHTML;
+      const inicio = paginaCompleta.indexOf('const canciones = [');
+      const fin    = paginaCompleta.indexOf('];', inicio) + 2;
+      const htmlFinal = '<!DOCTYPE html>\n' +
+        paginaCompleta.slice(0, inicio) +
+        datosActualizados +
+        paginaCompleta.slice(fin);
 
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="link-demo-container phcode-no-lp-edit-this">
-                    <p class="link-demo-text"><a id="editable-link" href="https://docs.phcode.dev/app-links/live-preview-edit" class="demo-link" target="_blank">Editar enlace</a></p>
-                </div>
-            </div>
+      const blob = new Blob([htmlFinal], { type: 'text/html' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = 'Repertorio_Baileys.html';
+      a.click();
+    });
 
-            <div class="success-message phcode-no-lp-edit" id="success-message-section6">
-                <span class="success-icon">✓</span>
-                <p id="success-message-text-section6">Has editado un enlace.</p>
-            </div>
+    // 11. ARRANCAR
+    actualizarSelectores();
+    dibujarTabla(lista);
 
-            <div class="mode-explanation phcode-no-lp-edit">
-                <h3 class="mode-title">Modo de edición vs. modo de vista previa</h3>
-                <div class="mode-cards" id="mode-cards-hover">
-                    <div class="mode-card edit-mode-card">
-                        <div class="mode-icon"><i class="fas fa-pencil"></i></div>
-                        <div class="mode-info">
-                            <strong>Modo de edición</strong>
-                            <p>Selecciona y cambia elementos en la página</p>
-                        </div>
-                    </div>
-                    <div class="mode-card preview-mode-card">
-                        <div class="mode-icon"><i class="fas fa-pencil"></i></div>
-                        <div class="mode-info">
-                            <strong>Modo de vista previa</strong>
-                            <p>Ve tu página como la verán los visitantes</p>
-                        </div>
-                    </div>
-                </div>
-                <p class="mode-hint">Presiona <strong>F8</strong> o haz clic en el botón <span class="play-button-hint"><i class="fa-solid fa-pencil"></i></span> para cambiar de modo.</p>
-            </div>
+    // EVENTOS DE LOS FILTROS (faltaban)
+    buscador.addEventListener('input', filtrar);
+    filtroRitmo.addEventListener('change', filtrar);
+    filtroInterprete.addEventListener('change', filtrar);
+  </script>
 
-            <div class="slide-controls phcode-no-lp-edit"></div>
-
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="6">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Consejos:</p>
-                <ul style="margin: 0 0 0 20px; padding: 0; list-style-type: disc;">
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Haz clic en cualquier enlace para seleccionarlo y editarlo.</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Activa <strong>Abrir en una pestaña nueva</strong> para abrir los enlaces en una página separada.</li>
-                    <li style="margin-bottom: 0; color: var(--text-primary);">Cambia al modo de vista previa (<strong>F8</strong>) para probar los enlaces y las interacciones</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Section 7: Completion Slide -->
-        <div class="paper-card section completion-slide phcode-no-lp-edit-this" id="section-7" data-section="7">
-            <div class="completion-content phcode-no-lp-edit">
-                <div class="completion-icon">
-                    <img src="images/rocket.svg" alt="Cohete" class="completion-icon-svg svg-orange">
-                </div>
-                <h2 class="completion-title">¡Ya estás listo para empezar a crear!</h2>
-                <p class="completion-body">Has aprendido a editar con la Vista previa en vivo.<br>Abre una carpeta con tus archivos HTML para empezar a editar.</p>
-
-                <p class="completion-helper">¿Necesitas más ayuda?</p>
-
-                <div class="resource-links">
-                    <a href="https://www.youtube.com/@phoenixcodeeditor3764" target="_blank" class="resource-link">
-                        <i class="fab fa-youtube"></i>
-                        <span>YouTube</span>
-                    </a>
-                    <a href="https://docs.phcode.dev/app-links/live-preview-edit" target="_blank" class="resource-link">
-                        <i class="fas fa-book"></i>
-                        <span>Documentación</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="slide-controls phcode-no-lp-edit"></div>
-        </div>
-
-        <!-- Section 8: Bonus - Check Layout with Measurements -->
-        <div class="paper-card section bonus-slide phcode-no-lp-edit-this" id="section-8" data-section="8">
-            <div class="section-header phcode-no-lp-edit">
-                <span class="bonus-badge">Una cosa más</span>
-                <h2 class="section-title">Comprueba el diseño con las medidas</h2>
-                <p class="section-subtitle">Haz clic en <img src="images/verticalEllipsis.svg" alt="menu" class="inline-icon"> en la barra de herramientas y selecciona <strong>Mostrar medidas</strong> para ver qué caja está desalineada.</p>
-            </div>
-
-            <div class="playground phcode-no-lp-edit-this">
-                <div class="alignment-demo phcode-no-lp-edit-this">
-                    <div class="align-box" id="align-box-1"><span class="phcode-no-lp-edit">Haz clic en <img src="images/verticalEllipsis.svg" alt="menu" class="inline-icon"></span></div>
-                    <div class="align-box misaligned"><span>Caja</span></div>
-                    <div class="align-box"><span>Caja</span></div>
-                </div>
-            </div>
-
-            <div class="slide-controls phcode-no-lp-edit"></div>
-
-            <div class="hint-content-inline phcode-no-lp-edit" data-section="8">
-                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text-primary);">Consejos:</p>
-                <ul style="margin: 0 0 0 20px; padding: 0; list-style-type: disc;">
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Haz clic en el icono <img src="images/verticalEllipsis.svg" alt="More options" class="inline-icon"> en la barra de herramientas, o haz clic derecho para abrir el menú.</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Activa <strong>Mostrar medidas</strong> para ver las guías de espaciado y alineación.</li>
-                    <li style="margin-bottom: 8px; color: var(--text-primary);">Las medidas te ayudan a detectar problemas de alineación rápidamente.</li>
-                </ul>
-            </div>
-        </div>
-    </main>
-
-    <!-- Confetti Container for Celebrations -->
-    <div class="confetti-container phcode-no-lp-edit" id="confetti-container"></div>
-
-    <!-- Edit/Preview toggle arrow (shown on section 6 hover). Points at the
-         pencil (edit-mode toggle) button in the live-preview toolbar. The
-         former center arrow was removed — it used to point at the preview
-         button when it was the dedicated play icon, but with the new
-         single-pencil toggle there is only one target worth pointing at. -->
-    <div class="arrow-pointer arrow-left" id="arrow-left">
-        <img src="images/arrowUp.svg" alt="Flecha" class="arrow-svg svg-gold">
-    </div>
-
-    <script src="phoenix-pro.js"></script>
 </body>
 </html>
